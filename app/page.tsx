@@ -1,10 +1,17 @@
+import { cookies } from "next/headers";
+
 import { BenefitsSection } from "@/components/landing/benefits-section";
 import { FaqSection } from "@/components/landing/faq-section";
 import { Footer } from "@/components/landing/footer";
 import { HeroSection } from "@/components/landing/hero-section";
 import { Navbar } from "@/components/landing/navbar";
+import { createClient } from "@/utils/supabase/server";
 
-export default function Home() {
+export default async function Home() {
+  const cookieStore = await cookies();
+  const supabase = createClient(cookieStore);
+  await supabase.auth.getUser();
+
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-[#0B0F19] text-white">
       <div className="pointer-events-none absolute inset-0">

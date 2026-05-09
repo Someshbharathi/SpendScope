@@ -2,7 +2,6 @@
 
 import { Sparkles } from "lucide-react";
 import { motion } from "motion/react";
-import Link from "next/link";
 
 export function AuditCtaSection() {
   return (
@@ -26,12 +25,9 @@ export function AuditCtaSection() {
           automatically identify unused licenses and suggest optimization
           strategies.
         </p>
-        <Link
-          href="/audit"
-          className="mt-9 inline-flex rounded-full bg-gradient-to-r from-blue-400 to-violet-400 px-8 py-3 text-sm font-semibold text-white shadow-[0_0_35px_rgba(121,141,255,0.55)] transition hover:translate-y-[-1px]"
-        >
+        <button className="mt-9 rounded-full bg-gradient-to-r from-blue-400 to-violet-400 px-8 py-3 text-sm font-semibold text-white shadow-[0_0_35px_rgba(121,141,255,0.55)] transition hover:translate-y-[-1px]">
           Run Free Spend Audit
-        </Link>
+        </button>
         <p className="mt-4 text-xs text-white/55">
           No credit card required. Read-only secure access.
         </p>
