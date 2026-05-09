@@ -23,6 +23,7 @@ const toolShape = z.object({
 
 export const auditFormSchema = z
   .object({
+    email: z.string().trim().email("Enter a valid email"),
     companyName: z
       .string()
       .trim()
