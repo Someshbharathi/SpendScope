@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { ArrowRight, Zap } from "lucide-react";
 import { motion } from "motion/react";
 
@@ -39,10 +40,13 @@ export function HeroSection() {
             team&apos;s SaaS spending in seconds.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4 md:justify-start">
-            <button className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-[#0B0F19] shadow-[0_0_30px_rgba(255,255,255,0.35)] transition hover:translate-y-[-1px] hover:bg-white/95">
+            <Link
+              href="/audit"
+              className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-[#0B0F19] shadow-[0_0_30px_rgba(255,255,255,0.35)] transition hover:translate-y-[-1px] hover:bg-white/95"
+            >
               Run Free Audit
               <ArrowRight className="h-4 w-4" />
-            </button>
+            </Link>
             <button className="rounded-full border border-white/10 bg-white/10 px-6 py-3 text-sm font-medium text-white backdrop-blur-xl transition hover:bg-white/15">
               See Example Report
             </button>
