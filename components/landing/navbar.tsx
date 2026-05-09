@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
+import Link from "next/link";
 
 import { Logo } from "./logo";
 
@@ -31,9 +32,12 @@ export function Navbar() {
             </a>
           ))}
         </div>
-        <button className="rounded-full border border-white/10 bg-white/10 px-5 py-2 text-sm font-medium text-white transition hover:bg-white/15">
+        <Link
+          href="/audit"
+          className="rounded-full border border-white/10 bg-white/10 px-5 py-2 text-sm font-medium text-white transition hover:bg-white/15"
+        >
           Get Started
-        </button>
+        </Link>
       </nav>
     </motion.header>
   );
