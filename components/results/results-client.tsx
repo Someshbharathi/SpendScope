@@ -2,7 +2,7 @@
 
 import { startTransition, useEffect, useState, type FormEvent } from "react";
 import Link from "next/link";
-import { ArrowRight, Loader2, Share2 } from "lucide-react";
+import { ArrowRight, Download, Loader2, Share2 } from "lucide-react";
 
 import { AppShell } from "@/components/app-shell";
 import { AuditActionPlanCard } from "@/components/audit/audit-action-plan-card";
@@ -86,7 +86,7 @@ function ShareAuditReportButton({
       type="button"
       onClick={handleShare}
       disabled={!shareId}
-      className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm font-medium text-white/85 transition enabled:hover:border-white/25 enabled:hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-45"
+      className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm font-medium text-white/85 transition enabled:hover:border-white/25 enabled:hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-45"
     >
       <Share2 className="h-4 w-4 shrink-0 opacity-80" aria-hidden />
       {label}
@@ -294,11 +294,15 @@ export function ResultsClient() {
       .filter((s) => s.trim().length > 0);
   })();
 
+  function handleDownloadPdf() {
+    if (typeof window !== "undefined") window.print();
+  }
+
   return (
     <AppShell>
       <AuditTopNav />
-      <main className="mx-auto w-full max-w-xl px-6 pb-24 pt-8 md:max-w-3xl md:px-8">
-        <header className="mb-10 space-y-4">
+      <main className="mx-auto w-full max-w-xl px-6 pb-24 pt-8 print:max-w-none print:[print-color-adjust:exact] print:px-4 print:pb-8 print:pt-4 md:max-w-3xl md:px-8">
+        <header className="mb-10 space-y-4 print:mb-6">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-violet-300/75">Audit results</p>
           {noModeledSavings ? (
             <>
@@ -329,32 +333,33 @@ export function ResultsClient() {
           )}
         </header>
 
-        <div className="mb-10 grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div className="mb-10 grid grid-cols-1 gap-3 print:mb-6 sm:grid-cols-3">
           <div className="rounded-xl border border-white/10 bg-white/4 px-4 py-4 text-center sm:text-left">
             <p className="text-[10px] font-semibold uppercase tracking-wider text-white/40">Total reported spend</p>
             <p className="mt-1 text-lg font-semibold tabular-nums text-white">{formatCurrency(totalCurrentSpend)}</p>
-            <p className="text-xs text-white/40">Per month across enabled tools</p>
+            <p className="mt-1 text-xs text-white/40">Per month across enabled tools</p>
           </div>
           <div className="rounded-xl border border-white/10 bg-white/4 px-4 py-4 text-center sm:text-left">
             <p className="text-[10px] font-semibold uppercase tracking-wider text-white/40">Potential monthly savings</p>
             <p className="mt-1 text-lg font-semibold tabular-nums text-emerald-400">{formatCurrency(totalMonthly)}</p>
-            <p className="text-xs text-white/40">Retail benchmark opportunity</p>
+            <p className="mt-1 text-xs text-white/40">Retail benchmark opportunity</p>
           </div>
           <div className="rounded-xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-4 text-center sm:text-left">
             <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-200/70">Potential annual impact</p>
             <p className="mt-1 text-xl font-semibold tabular-nums text-emerald-200">{formatCurrency(totalAnnual)}</p>
-            <p className="text-xs text-emerald-200/50">If monthly improvements hold</p>
+            <p className="mt-1 text-xs text-emerald-200/50">If monthly improvements hold</p>
           </div>
         </div>
 
         <SpendOverviewCharts
+          className="print:mb-6"
           currentMonthly={totalCurrentSpend}
           optimizedMonthly={totalOptimizedSpend}
           monthlySavings={totalMonthly}
           annualSavings={totalAnnual}
         />
 
-        <div className="mb-4 flex items-end justify-between gap-4">
+        <div className="mb-4 flex items-end justify-between gap-4 print:mb-3">
           <div>
             <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-white/45">Recommendations</h2>
             <p className="mt-1 text-xs text-white/35">
@@ -363,28 +368,39 @@ export function ResultsClient() {
           </div>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-4 print:space-y-3">
           {safeFindings.map((finding) => (
             <AuditActionPlanCard key={finding.toolId} finding={finding} teamSize={payload.teamSize} />
           ))}
         </div>
 
-        <ShareAuditReportButton
-          shareId={payload.shareId}
-          shareTitle="SpendScope AI spend audit"
-          shareSummary={execSnippet || executiveSummary}
-          monthlySavings={totalMonthly}
-        />
+        <div className="mt-4 grid grid-cols-1 gap-3 print:hidden sm:grid-cols-2">
+          <ShareAuditReportButton
+            shareId={payload.shareId}
+            shareTitle="SpendScope AI spend audit"
+            shareSummary={execSnippet || executiveSummary}
+            monthlySavings={totalMonthly}
+          />
+          <button
+            type="button"
+            onClick={handleDownloadPdf}
+            aria-label="Download report as PDF using your browser print dialog"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-white/18 bg-white/10 px-4 py-3 text-sm font-semibold text-white/95 shadow-sm transition hover:border-white/28 hover:bg-white/15"
+          >
+            <Download className="h-4 w-4 shrink-0 opacity-90" aria-hidden />
+            Download report
+          </button>
+        </div>
 
         <Link
           href="/audit"
-          className="mt-8 flex w-full items-center justify-center gap-2 rounded-xl bg-sky-500 py-3.5 text-sm font-semibold text-white shadow-lg shadow-sky-500/25 transition hover:bg-sky-400"
+          className="mt-8 flex w-full items-center justify-center gap-2 rounded-xl bg-sky-500 py-3.5 text-sm font-semibold text-white shadow-lg shadow-sky-500/25 transition hover:bg-sky-400 print:hidden"
         >
           Update inputs &amp; rerun audit
           <ArrowRight className="h-4 w-4" />
         </Link>
 
-        <GlassCard className="mt-8 border-white/10 bg-white/4 p-5">
+        <GlassCard className="mt-8 border-white/10 bg-white/4 p-5 print:hidden">
           <p className="text-sm font-medium text-white/85">
             We&apos;ll send a detailed copy of your audit report to your email.
           </p>
@@ -401,7 +417,7 @@ export function ResultsClient() {
         </GlassCard>
 
         {highSavings ? (
-          <p className="mt-6 text-center text-sm">
+          <p className="mt-6 text-center text-sm print:hidden">
             <Link
               href="/audit"
               className="font-medium text-cyan-300 underline-offset-2 transition hover:text-cyan-200 hover:underline"
@@ -411,12 +427,12 @@ export function ResultsClient() {
           </p>
         ) : null}
 
-        <p className="mt-10 max-w-lg mx-auto text-center text-[11px] leading-relaxed text-white/38">
+        <p className="mx-auto mt-10 max-w-lg text-center text-[11px] leading-relaxed text-white/38">
           Recommendations use published retail benchmarks and the seats and plans you entered—validate against invoices
           before renewal.
         </p>
 
-        <div className="mt-8 flex flex-col items-stretch gap-3 border-t border-white/10 pt-8 sm:flex-row sm:items-center sm:justify-center">
+        <div className="mt-8 flex flex-col items-stretch gap-3 border-t border-white/10 pt-8 print:hidden sm:flex-row sm:items-center sm:justify-center">
           <Link
             href="/"
             className="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm text-white/80 transition hover:border-white/25 hover:bg-white/10"

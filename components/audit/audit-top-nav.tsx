@@ -5,7 +5,7 @@ import { Logo } from "@/components/landing/logo";
 
 export function AuditTopNav() {
   return (
-    <header className="sticky top-0 z-40 border-b border-white/10 bg-[#0B0F19]/70 px-6 py-4 backdrop-blur-xl md:px-10 lg:px-16">
+    <header className="sticky top-0 z-40 border-b border-white/10 bg-[#0B0F19]/70 px-6 py-4 backdrop-blur-xl print:hidden md:px-10 lg:px-16">
       <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-4">
         <Link href="/" className="flex items-center gap-3 transition-opacity hover:opacity-90">
           <Logo />

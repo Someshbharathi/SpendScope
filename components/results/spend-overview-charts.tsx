@@ -25,11 +25,13 @@ export function SpendOverviewCharts({
   optimizedMonthly,
   monthlySavings,
   annualSavings,
+  className,
 }: {
   currentMonthly: number;
   optimizedMonthly: number;
   monthlySavings: number;
   annualSavings: number;
+  className?: string;
 }) {
   const gid = useId().replace(/:/g, "");
   const svgRef = useRef<SVGSVGElement>(null);
@@ -99,7 +101,7 @@ export function SpendOverviewCharts({
 
   return (
     <section
-      className="mb-10 rounded-xl border border-white/10 bg-white/4 p-5"
+      className={`mb-10 rounded-xl border border-white/10 bg-white/4 p-5 print:break-inside-auto print:border-white/15 print:bg-white/5 print:[print-color-adjust:exact] ${className ?? ""}`.trim()}
       aria-label="Spend outlook"
     >
       <p className="text-[10px] font-semibold uppercase tracking-wider text-white/40">Spend outlook</p>

@@ -6,6 +6,7 @@ import {
   ArrowRight,
   Briefcase,
   Building2,
+  Download,
   FileText,
   Sparkles,
   Target,
@@ -47,13 +48,13 @@ function MetaTile({
   value: string;
 }) {
   return (
-    <div className="flex gap-3 rounded-2xl border border-white/7 bg-white/4 p-4 shadow-inner shadow-black/20">
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-500/15 text-violet-300/90">
-        <Icon className="h-4 w-4" aria-hidden />
+    <div className="grid h-full min-h-20 grid-cols-[2.5rem_1fr] items-center gap-x-3 gap-y-0 rounded-2xl border border-white/10 bg-white/4 p-4 shadow-inner shadow-black/20">
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center self-center rounded-xl bg-violet-500/15 text-violet-300/90">
+        <Icon className="h-4 w-4 shrink-0" aria-hidden />
       </div>
-      <div className="min-w-0 flex-1">
-        <p className="text-[10px] font-semibold uppercase tracking-wider text-white/38">{label}</p>
-        <p className="mt-0.5 truncate text-sm font-medium text-white/90">{value}</p>
+      <div className="min-w-0 self-center">
+        <p className="text-[10px] font-semibold uppercase leading-none tracking-wider text-white/40">{label}</p>
+        <p className="mt-0.5 wrap-break-word text-sm font-medium leading-snug text-white/90">{value}</p>
       </div>
     </div>
   );
@@ -86,19 +87,23 @@ export function SharedAuditReportClient({
     .slice(0, 2)
     .join(" ");
 
+  function handleDownloadPdf() {
+    if (typeof window !== "undefined") window.print();
+  }
+
   return (
     <AppShell>
       <AuditTopNav />
-      <main className="relative mx-auto w-full max-w-3xl px-4 pb-28 pt-6 sm:px-6 md:px-8">
+      <main className="relative mx-auto w-full max-w-3xl px-4 pb-28 pt-6 print:max-w-none print:px-4 print:pb-8 print:pt-4 sm:px-6 md:px-8">
         <div
           aria-hidden
-          className="pointer-events-none absolute left-1/2 top-8 h-128 w-[min(100%,42rem)] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse_at_50%_20%,rgba(139,92,246,0.18),transparent_58%)] blur-3xl"
+          className="pointer-events-none absolute left-1/2 top-8 h-128 w-[min(100%,42rem)] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse_at_50%_20%,rgba(139,92,246,0.18),transparent_58%)] blur-3xl print:hidden"
         />
 
-        <article className="relative overflow-hidden rounded-[1.75rem] border border-white/12 bg-[linear-gradient(165deg,rgba(255,255,255,0.09)_0%,rgba(255,255,255,0.03)_28%,rgba(11,15,25,0.65)_100%)] shadow-[0_0_0_1px_rgba(255,255,255,0.06)_inset,0_32px_100px_-28px_rgba(99,102,241,0.45)]">
+        <article className="relative overflow-hidden rounded-[1.75rem] border border-white/12 bg-[linear-gradient(165deg,rgba(255,255,255,0.09)_0%,rgba(255,255,255,0.03)_28%,rgba(11,15,25,0.65)_100%)] shadow-[0_0_0_1px_rgba(255,255,255,0.06)_inset,0_32px_100px_-28px_rgba(99,102,241,0.45)] print:overflow-visible print:[print-color-adjust:exact]">
           <div className="h-[3px] w-full bg-linear-to-r from-violet-500 via-fuchsia-500 to-cyan-400" />
 
-          <div className="space-y-12 px-5 py-9 sm:px-8 sm:py-11 md:px-10 md:py-12">
+          <div className="space-y-12 px-5 py-9 print:space-y-8 sm:px-8 sm:py-11 md:px-10 md:py-12">
             {/* Cover */}
             <header className="space-y-6">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -116,10 +121,24 @@ export function SharedAuditReportClient({
                     </p>
                   </div>
                 </div>
-                <div className="sm:pt-1 sm:text-right">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/35">Snapshot</p>
-                  <p className="mt-1 max-w-56 text-xs leading-relaxed text-white/50 sm:ml-auto">
-                    Read-only view · Benchmarks vs retail list pricing
+                <div className="flex flex-col gap-3 sm:items-end">
+                  <div className="w-full sm:w-auto sm:pt-1 sm:text-right">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/35">Snapshot</p>
+                    <p className="mt-1 max-w-56 text-xs leading-relaxed text-white/50 sm:ml-auto">
+                      Read-only view · Benchmarks vs retail list pricing
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleDownloadPdf}
+                    aria-label="Download report as PDF using your browser print dialog"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-white/18 bg-white/10 px-4 py-2.5 text-sm font-semibold text-white/95 shadow-sm transition hover:border-white/28 hover:bg-white/15 sm:w-auto print:hidden"
+                  >
+                    <Download className="h-4 w-4 shrink-0 opacity-90" aria-hidden />
+                    Download report
+                  </button>
+                  <p className="max-w-56 text-center text-[11px] leading-snug text-white/40 print:hidden sm:text-right">
+                    In the print dialog, choose <span className="text-white/55">Save as PDF</span>.
                   </p>
                 </div>
               </div>
@@ -143,7 +162,7 @@ export function SharedAuditReportClient({
                 </p>
               </div>
 
-              <div className="relative overflow-hidden rounded-2xl border border-violet-400/15 bg-linear-to-br from-violet-500/12 via-white/4 to-cyan-500/10 p-6 sm:p-7">
+              <div className="relative overflow-hidden rounded-2xl border border-violet-400/15 bg-linear-to-br from-violet-500/12 via-white/4 to-cyan-500/10 p-6 print:overflow-visible sm:p-7">
                 <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-fuchsia-500/20 blur-3xl" aria-hidden />
                 <div className="relative border-l-2 border-violet-400/70 pl-5 sm:pl-6">
                   {noModeledSavings ? (
@@ -210,13 +229,14 @@ export function SharedAuditReportClient({
             </section>
 
             <SpendOverviewCharts
+              className="print:mb-6"
               currentMonthly={totalCurrentSpend}
               optimizedMonthly={totalOptimizedSpend}
               monthlySavings={totalMonthly ?? 0}
               annualSavings={totalAnnual ?? 0}
             />
 
-            <section className="space-y-5">
+            <section className="space-y-5 print:space-y-3">
               <div>
                 <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-white/45">Recommendations</h2>
                 <p className="mt-1.5 text-xs text-white/35">
@@ -233,20 +253,22 @@ export function SharedAuditReportClient({
 
           <footer className="border-t border-white/10 bg-black/25 px-5 py-9 sm:px-8 md:px-10">
             <div className="mx-auto max-w-lg text-center">
-              <p className="text-base font-medium text-white/90">Want to optimize your own AI stack?</p>
-              <p className="mt-2 text-sm text-white/45">Run a fresh audit with your tools, seats, and spend.</p>
-              <Link
-                href="/audit"
-                className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-6 py-3.5 text-sm font-semibold text-[#0B0F19] shadow-lg shadow-black/30 transition hover:bg-white/95 sm:w-auto"
-              >
-                Run your own audit
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-              <p className="mx-auto mt-8 max-w-md text-[11px] leading-relaxed text-white/35">
+              <div className="print:hidden">
+                <p className="text-base font-medium text-white/90">Want to optimize your own AI stack?</p>
+                <p className="mt-2 text-sm text-white/45">Run a fresh audit with your tools, seats, and spend.</p>
+                <Link
+                  href="/audit"
+                  className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-6 py-3.5 text-sm font-semibold text-[#0B0F19] shadow-lg shadow-black/30 transition hover:bg-white/95 sm:w-auto"
+                >
+                  Run your own audit
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+              <p className="mx-auto mt-8 max-w-md text-[11px] leading-relaxed text-white/35 print:mt-4">
                 Recommendations use published retail benchmarks and the seats and plans in this audit—validate against
                 invoices before renewal.
               </p>
-              <div className="mt-8 flex justify-center">
+              <div className="mt-8 flex justify-center print:hidden">
                 <Link
                   href="/"
                   className="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm text-white/80 transition hover:border-white/25 hover:bg-white/10"
