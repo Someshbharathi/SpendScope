@@ -1,12 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, FileText } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import {
+  ArrowRight,
+  Briefcase,
+  Building2,
+  FileText,
+  Sparkles,
+  Target,
+  Users,
+} from "lucide-react";
 
 import { AppShell } from "@/components/app-shell";
 import { AuditActionPlanCard } from "@/components/audit/audit-action-plan-card";
 import { AuditTopNav } from "@/components/audit/audit-top-nav";
-import { GlassCard } from "@/components/audit/glass-card";
 import { SpendOverviewCharts } from "@/components/results/spend-overview-charts";
 import type { AuditReport, UseCase } from "@/lib/audit-types";
 import { normalizeFinding } from "@/lib/audit-report-normalize";
@@ -28,6 +36,28 @@ export type SharedAuditReportProps = {
   report: AuditReport;
   generatedAtLabel: string;
 };
+
+function MetaTile({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: LucideIcon;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="flex gap-3 rounded-2xl border border-white/7 bg-white/4 p-4 shadow-inner shadow-black/20">
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-500/15 text-violet-300/90">
+        <Icon className="h-4 w-4" aria-hidden />
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="text-[10px] font-semibold uppercase tracking-wider text-white/38">{label}</p>
+        <p className="mt-0.5 truncate text-sm font-medium text-white/90">{value}</p>
+      </div>
+    </div>
+  );
+}
 
 export function SharedAuditReportClient({
   companyName,
@@ -59,149 +89,175 @@ export function SharedAuditReportClient({
   return (
     <AppShell>
       <AuditTopNav />
-      <main className="relative mx-auto w-full max-w-xl px-6 pb-24 pt-8 md:max-w-3xl md:px-8">
+      <main className="relative mx-auto w-full max-w-3xl px-4 pb-28 pt-6 sm:px-6 md:px-8">
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 mx-auto h-[420px] max-w-3xl rounded-full bg-[radial-gradient(ellipse_at_50%_0%,rgba(139,92,246,0.14),transparent_55%)] blur-2xl"
+          className="pointer-events-none absolute left-1/2 top-8 h-128 w-[min(100%,42rem)] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse_at_50%_20%,rgba(139,92,246,0.18),transparent_58%)] blur-3xl"
         />
 
-        <header className="relative mb-10 space-y-4 border-b border-white/10 pb-10">
-          <div className="flex flex-wrap items-center gap-2 text-violet-300/80">
-            <FileText className="h-4 w-4 shrink-0" aria-hidden />
-            <p className="text-xs font-medium uppercase tracking-[0.2em]">Shared report</p>
-          </div>
-          <h1 className="text-balance text-3xl font-semibold leading-tight tracking-tight text-white md:text-4xl">
-            AI Spend Audit Report
-          </h1>
-          <p className="text-sm text-white/45">Generated {generatedAtLabel}</p>
-          <GlassCard className="border-white/10 bg-white/4 p-5">
-            <dl className="grid gap-3 text-sm sm:grid-cols-2">
-              <div>
-                <dt className="text-[10px] font-semibold uppercase tracking-wider text-white/40">Organization</dt>
-                <dd className="mt-1 font-medium text-white/90">{companyName || "—"}</dd>
-              </div>
-              <div>
-                <dt className="text-[10px] font-semibold uppercase tracking-wider text-white/40">Team size</dt>
-                <dd className="mt-1 font-medium text-white/90">{teamSize} people</dd>
-              </div>
-              <div>
-                <dt className="text-[10px] font-semibold uppercase tracking-wider text-white/40">Stakeholder role</dt>
-                <dd className="mt-1 text-white/75">{role || "—"}</dd>
-              </div>
-              {useCaseLabel ? (
-                <div>
-                  <dt className="text-[10px] font-semibold uppercase tracking-wider text-white/40">Primary use case</dt>
-                  <dd className="mt-1 text-white/75">{useCaseLabel}</dd>
+        <article className="relative overflow-hidden rounded-[1.75rem] border border-white/12 bg-[linear-gradient(165deg,rgba(255,255,255,0.09)_0%,rgba(255,255,255,0.03)_28%,rgba(11,15,25,0.65)_100%)] shadow-[0_0_0_1px_rgba(255,255,255,0.06)_inset,0_32px_100px_-28px_rgba(99,102,241,0.45)]">
+          <div className="h-[3px] w-full bg-linear-to-r from-violet-500 via-fuchsia-500 to-cyan-400" />
+
+          <div className="space-y-12 px-5 py-9 sm:px-8 sm:py-11 md:px-10 md:py-12">
+            {/* Cover */}
+            <header className="space-y-6">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div className="space-y-3">
+                  <div className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/5 px-3 py-1.5 text-violet-200/85">
+                    <FileText className="h-3.5 w-3.5 shrink-0 opacity-90" aria-hidden />
+                    <span className="text-[11px] font-semibold uppercase tracking-[0.22em]">Shared report</span>
+                  </div>
+                  <div>
+                    <h1 className="text-balance text-3xl font-semibold leading-[1.12] tracking-tight text-white sm:text-4xl md:text-[2.35rem]">
+                      AI Spend Audit Report
+                    </h1>
+                    <p className="mt-2 text-sm text-white/45">
+                      Generated <span className="text-white/65">{generatedAtLabel}</span>
+                    </p>
+                  </div>
                 </div>
-              ) : null}
-            </dl>
-          </GlassCard>
-        </header>
+                <div className="sm:pt-1 sm:text-right">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/35">Snapshot</p>
+                  <p className="mt-1 max-w-56 text-xs leading-relaxed text-white/50 sm:ml-auto">
+                    Read-only view · Benchmarks vs retail list pricing
+                  </p>
+                </div>
+              </div>
 
-        <div className="relative rounded-2xl border border-white/10 bg-white/2 p-6 shadow-[0_0_80px_-24px_rgba(99,102,241,0.35)] backdrop-blur-sm sm:p-8 md:p-10">
-          <header className="mb-10 space-y-4">
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-violet-300/75">Audit results</p>
-            <div className="h-px w-14 rounded-full bg-linear-to-r from-violet-400 via-fuchsia-400 to-sky-400 opacity-90" />
-            {noModeledSavings ? (
-              <>
-                <h2 className="text-balance text-3xl font-semibold leading-tight tracking-tight text-white md:text-4xl">
-                  Your stack looks efficient at retail pricing
-                </h2>
-                <p className="text-sm leading-relaxed text-white/55">
-                  We didn&apos;t surface a material gap versus published pricing for what you entered—rerun when seats or
-                  usage shifts meaningfully.
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                <MetaTile icon={Building2} label="Organization" value={companyName || "—"} />
+                <MetaTile icon={Users} label="Team size" value={`${teamSize} people`} />
+                <MetaTile icon={Briefcase} label="Stakeholder role" value={role || "—"} />
+                <MetaTile icon={Target} label="Primary use case" value={useCaseLabel ?? "—"} />
+              </div>
+            </header>
+
+            <div className="h-px w-full bg-linear-to-r from-transparent via-white/15 to-transparent" aria-hidden />
+
+            {/* Insight */}
+            <section className="space-y-5" aria-labelledby="shared-result-heading">
+              <div className="flex items-center gap-2 text-violet-300/80">
+                <Sparkles className="h-4 w-4 shrink-0" aria-hidden />
+                <p id="shared-results-eyebrow" className="text-xs font-semibold uppercase tracking-[0.2em]">
+                  Audit results
                 </p>
-              </>
-            ) : (
-              <>
-                <h2 className="text-balance text-3xl font-semibold leading-tight tracking-tight text-white md:text-4xl">
-                  About{" "}
-                  <span className="bg-linear-to-r from-violet-400 via-fuchsia-400 to-sky-400 bg-clip-text text-transparent drop-shadow-[0_0_28px_rgba(167,139,250,0.35)]">
+              </div>
+
+              <div className="relative overflow-hidden rounded-2xl border border-violet-400/15 bg-linear-to-br from-violet-500/12 via-white/4 to-cyan-500/10 p-6 sm:p-7">
+                <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-fuchsia-500/20 blur-3xl" aria-hidden />
+                <div className="relative border-l-2 border-violet-400/70 pl-5 sm:pl-6">
+                  {noModeledSavings ? (
+                    <>
+                      <h2
+                        id="shared-result-heading"
+                        className="text-balance text-2xl font-semibold leading-tight tracking-tight text-white sm:text-3xl md:text-[2rem]"
+                      >
+                        Your stack looks efficient at retail pricing
+                      </h2>
+                      <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/60">
+                        We didn&apos;t surface a material gap versus published pricing for what you entered—rerun when
+                        seats or usage shifts meaningfully.
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <h2
+                        id="shared-result-heading"
+                        className="text-balance text-2xl font-semibold leading-tight tracking-tight text-white sm:text-3xl md:text-[2rem]"
+                      >
+                        About{" "}
+                        <span className="bg-linear-to-r from-violet-300 via-fuchsia-400 to-cyan-300 bg-clip-text text-transparent drop-shadow-[0_0_32px_rgba(167,139,250,0.4)]">
+                          {formatCurrency(totalMonthly ?? 0)}
+                        </span>
+                        <span className="text-white/90">/month</span> on the table
+                      </h2>
+                      <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/60">
+                        {execSnippet || executiveSummary}{" "}
+                        <span className="text-white/40">
+                          Based on published retail benchmarks and the plans and seats you shared—not a vendor quote.
+                        </span>
+                      </p>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-center sm:text-left">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-white/40">Total reported spend</p>
+                  <p className="mt-1.5 text-xl font-semibold tabular-nums text-white">{formatCurrency(totalCurrentSpend)}</p>
+                  <p className="mt-1 text-xs text-white/38">Per month across enabled tools</p>
+                </div>
+                <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-center sm:text-left">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-white/40">
+                    Potential monthly savings
+                  </p>
+                  <p className="mt-1.5 text-xl font-semibold tabular-nums text-emerald-400">
                     {formatCurrency(totalMonthly ?? 0)}
-                  </span>
-                  <span className="text-white/90">/month</span> on the table
-                </h2>
-                <p className="text-sm leading-relaxed text-white/55">
-                  {execSnippet || executiveSummary}{" "}
-                  <span className="text-white/40">
-                    Based on published retail benchmarks and the plans and seats you shared—not a vendor quote.
-                  </span>
+                  </p>
+                  <p className="mt-1 text-xs text-white/38">Retail benchmark opportunity</p>
+                </div>
+                <div className="rounded-2xl border border-emerald-400/25 bg-emerald-500/12 px-4 py-4 text-center sm:text-left">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-200/75">
+                    Potential annual impact
+                  </p>
+                  <p className="mt-1.5 text-2xl font-semibold tabular-nums text-emerald-200">
+                    {formatCurrency(totalAnnual ?? 0)}
+                  </p>
+                  <p className="mt-1 text-xs text-emerald-200/45">If monthly improvements hold</p>
+                </div>
+              </div>
+            </section>
+
+            <SpendOverviewCharts
+              currentMonthly={totalCurrentSpend}
+              optimizedMonthly={totalOptimizedSpend}
+              monthlySavings={totalMonthly ?? 0}
+              annualSavings={totalAnnual ?? 0}
+            />
+
+            <section className="space-y-5">
+              <div>
+                <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-white/45">Recommendations</h2>
+                <p className="mt-1.5 text-xs text-white/35">
+                  Grounded in retail benchmarks—prioritized by impact on your stack.
                 </p>
-              </>
-            )}
-          </header>
-
-          <div className="mb-10 grid grid-cols-1 gap-3 sm:grid-cols-3">
-            <div className="rounded-xl border border-white/10 bg-white/4 px-4 py-4 text-center sm:text-left">
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-white/40">Total reported spend</p>
-              <p className="mt-1 text-lg font-semibold tabular-nums text-white">{formatCurrency(totalCurrentSpend)}</p>
-              <p className="text-xs text-white/40">Per month across enabled tools</p>
-            </div>
-            <div className="rounded-xl border border-white/10 bg-white/4 px-4 py-4 text-center sm:text-left">
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-white/40">Potential monthly savings</p>
-              <p className="mt-1 text-lg font-semibold tabular-nums text-emerald-400">
-                {formatCurrency(totalMonthly ?? 0)}
-              </p>
-              <p className="text-xs text-white/40">Retail benchmark opportunity</p>
-            </div>
-            <div className="rounded-xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-4 text-center sm:text-left">
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-200/70">Potential annual impact</p>
-              <p className="mt-1 text-xl font-semibold tabular-nums text-emerald-200">
-                {formatCurrency(totalAnnual ?? 0)}
-              </p>
-              <p className="text-xs text-emerald-200/50">If monthly improvements hold</p>
-            </div>
+              </div>
+              <div className="space-y-4">
+                {safeFindings.map((finding) => (
+                  <AuditActionPlanCard key={finding.toolId} finding={finding} teamSize={teamSize} />
+                ))}
+              </div>
+            </section>
           </div>
 
-          <SpendOverviewCharts
-            currentMonthly={totalCurrentSpend}
-            optimizedMonthly={totalOptimizedSpend}
-            monthlySavings={totalMonthly ?? 0}
-            annualSavings={totalAnnual ?? 0}
-          />
-
-          <div className="mb-4 flex items-end justify-between gap-4">
-            <div>
-              <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-white/45">Recommendations</h2>
-              <p className="mt-1 text-xs text-white/35">
-                Grounded in retail benchmarks—prioritized by impact on your stack.
+          <footer className="border-t border-white/10 bg-black/25 px-5 py-9 sm:px-8 md:px-10">
+            <div className="mx-auto max-w-lg text-center">
+              <p className="text-base font-medium text-white/90">Want to optimize your own AI stack?</p>
+              <p className="mt-2 text-sm text-white/45">Run a fresh audit with your tools, seats, and spend.</p>
+              <Link
+                href="/audit"
+                className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-6 py-3.5 text-sm font-semibold text-[#0B0F19] shadow-lg shadow-black/30 transition hover:bg-white/95 sm:w-auto"
+              >
+                Run your own audit
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+              <p className="mx-auto mt-8 max-w-md text-[11px] leading-relaxed text-white/35">
+                Recommendations use published retail benchmarks and the seats and plans in this audit—validate against
+                invoices before renewal.
               </p>
+              <div className="mt-8 flex justify-center">
+                <Link
+                  href="/"
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm text-white/80 transition hover:border-white/25 hover:bg-white/10"
+                >
+                  Back to home
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
             </div>
-          </div>
-
-          <div className="space-y-4">
-            {safeFindings.map((finding) => (
-              <AuditActionPlanCard key={finding.toolId} finding={finding} teamSize={teamSize} />
-            ))}
-          </div>
-        </div>
-
-        <GlassCard className="relative mt-10 border-white/10 bg-white/4 p-6 text-center">
-          <p className="text-sm font-medium text-white/90">Want to optimize your own AI stack?</p>
-          <p className="mt-2 text-xs text-white/45">Run a fresh audit with your tools, seats, and spend.</p>
-          <Link
-            href="/audit"
-            className="mt-5 inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-[#0B0F19] transition hover:bg-white/95"
-          >
-            Run your own audit
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-        </GlassCard>
-
-        <p className="relative mt-10 text-center text-[11px] leading-relaxed text-white/35">
-          Recommendations use published retail benchmarks and the seats and plans in this audit—validate against invoices
-          before renewal.
-        </p>
-
-        <div className="relative mt-8 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-center">
-          <Link
-            href="/"
-            className="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm text-white/80 transition hover:border-white/25 hover:bg-white/10"
-          >
-            Back to home
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
+          </footer>
+        </article>
       </main>
     </AppShell>
   );

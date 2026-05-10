@@ -94,47 +94,118 @@ function ShareAuditReportButton({
   );
 }
 
-function NotifyOptimizationForm({ defaultEmail }: { defaultEmail: string }) {
+function NotifyOptimizationForm({
+  defaultEmail,
+  shareId,
+  executiveSummary,
+  monthlySavings,
+  annualSavings,
+  topRecommendations,
+}: {
+  defaultEmail: string;
+  shareId: string | null;
+  executiveSummary: string;
+  monthlySavings: number;
+  annualSavings: number;
+  topRecommendations: string[];
+}) {
   const [email, setEmail] = useState(defaultEmail);
-  const [submitted, setSubmitted] = useState(false);
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const trimmed = email.trim();
     if (!trimmed) return;
-    console.log("[SpendScope] Audit report email requested", { email: trimmed });
-    setSubmitted(true);
+    if (!shareId) {
+      setErrorMessage("Share link is not available. Run the audit again from the start.");
+      setStatus("error");
+      return;
+    }
+
+    setStatus("loading");
+    setErrorMessage(null);
+
+    try {
+      const res = await fetch("/api/send-report", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: trimmed,
+          share_id: shareId,
+          executive_summary: executiveSummary,
+          monthly_savings: monthlySavings,
+          annual_savings: annualSavings,
+          top_recommendations: topRecommendations,
+        }),
+      });
+
+      const payload = (await res.json().catch(() => ({}))) as { error?: string; message?: string };
+
+      if (!res.ok) {
+        setErrorMessage(payload.error ?? "Failed to send report. Please try again later.");
+        setStatus("error");
+        return;
+      }
+
+      setStatus("success");
+    } catch {
+      setErrorMessage("Failed to send report. Please try again later.");
+      setStatus("error");
+    }
   }
 
-  if (submitted) {
+  if (status === "success") {
     return (
-      <p className="text-sm text-emerald-200/90">
-        Thanks — we&apos;ll email your detailed audit report to that address shortly.
+      <p className="text-sm text-emerald-200/90" role="status">
+        Audit report sent successfully — check your inbox for the full summary and link.
       </p>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-3 sm:flex-row sm:items-end">
-      <div className="min-w-0 flex-1 space-y-1.5">
-        <label htmlFor="notify-email" className="text-xs font-medium text-white/55">
-          Email
-        </label>
-        <input
-          id="notify-email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="you@company.com"
-          className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white outline-none placeholder:text-white/35 focus:border-white/25"
-        />
+    <form onSubmit={handleSubmit} className="space-y-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+        <div className="min-w-0 flex-1 space-y-1.5">
+          <label htmlFor="notify-email" className="text-xs font-medium text-white/55">
+            Email
+          </label>
+          <input
+            id="notify-email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="you@company.com"
+            disabled={status === "loading"}
+            autoComplete="email"
+            className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white outline-none placeholder:text-white/35 focus:border-white/25 disabled:opacity-50"
+          />
+        </div>
+        <button
+          type="submit"
+          disabled={status === "loading" || !shareId}
+          className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-[#0B0F19] transition hover:bg-white/95 disabled:cursor-not-allowed disabled:opacity-45"
+        >
+          {status === "loading" ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+              Sending…
+            </>
+          ) : (
+            "Email me the report"
+          )}
+        </button>
       </div>
-      <button
-        type="submit"
-        className="shrink-0 rounded-full bg-white px-6 py-3 text-sm font-semibold text-[#0B0F19] transition hover:bg-white/95"
-      >
-        Email me the report
-      </button>
+      {status === "error" && errorMessage ? (
+        <p className="text-sm text-rose-300/95" role="alert">
+          {errorMessage}
+        </p>
+      ) : null}
+      {!shareId ? (
+        <p className="text-xs text-white/45">
+          Complete and save an audit to generate a share link — then you can email this report.
+        </p>
+      ) : null}
     </form>
   );
 }
@@ -201,7 +272,6 @@ export function ResultsClient() {
   const totalAnnual = report.totalAnnualSavings;
   const totalCurrentSpend = safeFindings.reduce((sum, f) => sum + f.currentSpend, 0);
   const totalOptimizedSpend = Math.max(0, safeFindings.reduce((sum, f) => sum + f.optimizedSpend, 0));
-  const lowSavings = totalMonthly < 100;
   const highSavings = totalMonthly >= 500;
   const noModeledSavings = totalMonthly <= 0;
 
@@ -211,6 +281,18 @@ export function ResultsClient() {
     .filter(Boolean)
     .slice(0, 2)
     .join(" ");
+
+  const topRecommendationsForEmail: string[] = (() => {
+    const fromBullets = (report.summaryBullets ?? []).filter(
+      (b): b is string => typeof b === "string" && b.trim().length > 0,
+    );
+    if (fromBullets.length > 0) return fromBullets.slice(0, 5);
+    return [...safeFindings]
+      .sort((a, b) => b.monthlySavings - a.monthlySavings)
+      .slice(0, 5)
+      .map((f) => f.oneSentenceReason || f.optimizationSummary)
+      .filter((s) => s.trim().length > 0);
+  })();
 
   return (
     <AppShell>
@@ -302,16 +384,21 @@ export function ResultsClient() {
           <ArrowRight className="h-4 w-4" />
         </Link>
 
-        {lowSavings ? (
-          <GlassCard className="mt-8 border-white/10 bg-white/4 p-5">
-            <p className="text-sm font-medium text-white/85">
-              We&apos;ll send a detailed copy of your audit report to your email.
-            </p>
-            <div className="mt-4">
-              <NotifyOptimizationForm defaultEmail={payload.email} />
-            </div>
-          </GlassCard>
-        ) : null}
+        <GlassCard className="mt-8 border-white/10 bg-white/4 p-5">
+          <p className="text-sm font-medium text-white/85">
+            We&apos;ll send a detailed copy of your audit report to your email.
+          </p>
+          <div className="mt-4">
+            <NotifyOptimizationForm
+              defaultEmail={payload.email}
+              shareId={payload.shareId}
+              executiveSummary={executiveSummary}
+              monthlySavings={totalMonthly}
+              annualSavings={totalAnnual}
+              topRecommendations={topRecommendationsForEmail}
+            />
+          </div>
+        </GlassCard>
 
         {highSavings ? (
           <p className="mt-6 text-center text-sm">

@@ -138,3 +138,57 @@ Because of that, I could not start the project on the first day.
 - Write documentation files
 - Add testing and deployment polish
 - Finalize the project for submission
+
+---
+
+## Day 4 — 2026-05-09
+
+### Hours worked
+7–8 hours
+
+### What I did
+- Built the AI spend audit form page
+- Added support for:
+  - ChatGPT
+  - Claude
+  - Cursor
+  - GitHub Copilot
+  - Gemini
+- Implemented tool toggles, plan selection, spend inputs, and seat inputs
+- Built the core audit engine logic
+- Added benchmark-based pricing comparisons
+- Implemented:
+  - overspending detection
+  - plan optimization logic
+  - recommendation generation
+  - estimated savings calculations
+- Built the audit results page
+- Added:
+  - executive summaries
+  - optimization recommendations
+  - confidence levels
+  - benchmark reasoning
+  - savings breakdown cards
+- Improved recommendation realism and financial reasoning
+- Fixed Supabase insert flow and audit persistence
+- Generated share IDs for saved audits
+- Improved UI polish and card layouts
+
+### What I learned
+- Financial recommendation logic design
+- Benchmark-based pricing evaluation
+- JSON-based audit result storage
+- Realistic SaaS audit UX patterns
+- Structuring defensible optimization recommendations
+
+### Blockers / What I'm stuck on
+- Fine-tuning recommendation thresholds for realistic savings detection
+- Improving edge-case handling for unusual pricing inputs
+
+### Plan for tomorrow
+- Add public shareable audit pages
+- Improve audit result accuracy
+- Add Open Graph metadata
+- Write documentation files
+- Add testing and deployment polish
+- Finalize the project for submission
