@@ -16,7 +16,6 @@ export function getDefaultAuditFormValues(): AuditFormValues {
     };
   }
   return {
-    email: "",
     companyName: "",
     role: "",
     teamSize: 5,
@@ -81,7 +80,6 @@ export function parseAuditFormFromStorage(raw: string): AuditFormValues | null {
         : getDefaultAuditFormValues().useCase;
 
     return {
-      email: sanitizeText(data.email, getDefaultAuditFormValues().email),
       companyName: sanitizeText(data.companyName, getDefaultAuditFormValues().companyName),
       role: sanitizeText(data.role, getDefaultAuditFormValues().role),
       teamSize,
@@ -131,8 +129,6 @@ export function loadAuditSessionPayload(): AuditSessionPayload | null {
     if (!isRecord(data)) return null;
     if (data.version !== 1) return null;
     if (typeof data.savedAt !== "string") return null;
-    const email = sanitizeText(data.email, "");
-    if (!email) return null;
     const companyName = sanitizeText(data.companyName, "");
     const role = sanitizeText(data.role, "");
     if (!companyName || !role) return null;
@@ -159,7 +155,6 @@ export function loadAuditSessionPayload(): AuditSessionPayload | null {
     return {
       version: 1,
       savedAt: data.savedAt,
-      email,
       companyName,
       role,
       teamSize: data.teamSize,
@@ -167,8 +162,6 @@ export function loadAuditSessionPayload(): AuditSessionPayload | null {
       tools,
       report,
       auditRowId,
-      shareId:
-        data.shareId === null || typeof data.shareId === "string" ? data.shareId : null,
     };
   } catch {
     return null;

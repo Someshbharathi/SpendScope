@@ -15,7 +15,6 @@ import { GlassCard } from "@/components/audit/glass-card";
 import { usePersistedAuditForm } from "@/hooks/use-persisted-audit-form";
 import type { AuditFormValues, ToolId } from "@/lib/audit-types";
 import { TOOL_IDS, USE_CASES } from "@/lib/audit-types";
-import { buildAuditInsertPayload, generateShareId, insertAuditRow } from "@/lib/audit-db";
 import { runAuditEngine } from "@/lib/audit-engine";
 import { auditFormSchema } from "@/lib/audit-form-schema";
 import {
@@ -53,7 +52,6 @@ export function AuditForm() {
   const watchedTools =
     useWatch({ control: form.control, name: "tools" }) ??
     getDefaultAuditFormValues().tools;
-  const email = useWatch({ control: form.control, name: "email" });
   const companyName = useWatch({ control: form.control, name: "companyName" });
   const role = useWatch({ control: form.control, name: "role" });
   const teamSize = useWatch({ control: form.control, name: "teamSize" });
@@ -61,19 +59,12 @@ export function AuditForm() {
   const anyEnabled = TOOL_IDS.some((id) => watchedTools[id]?.enabled);
   const teamSizeValid =
     typeof teamSize === "number" && Number.isFinite(teamSize) && teamSize >= 1;
-  const emailValid = typeof email === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
   const companyNameValid =
     typeof companyName === "string" && companyName.trim().length > 0;
   const roleValid = typeof role === "string" && role.trim().length > 0;
 
   const canSubmit =
-    hydrated &&
-    anyEnabled &&
-    teamSizeValid &&
-    emailValid &&
-    companyNameValid &&
-    roleValid &&
-    !isSubmitting;
+    hydrated && anyEnabled && teamSizeValid && companyNameValid && roleValid && !isSubmitting;
 
   async function onSubmit(values: AuditFormValues) {
     setSubmitError(null);
@@ -85,39 +76,41 @@ export function AuditForm() {
     }
 
     const report = runAuditEngine(parsed.data);
-    const shareId = generateShareId();
-    const payload = buildAuditInsertPayload(parsed.data, report, shareId);
+
+    const toolsPayload = {
+      company_name: parsed.data.companyName,
+      role: parsed.data.role,
+      useCase: parsed.data.useCase,
+      tools: parsed.data.tools,
+    };
 
     try {
       const supabase = createClient();
-      console.log("FORM VALUES", parsed.data);
-      console.log("TOOLS", payload.tools_json.enabledTools);
-      console.log("AUDIT RESULTS", report);
-      console.log("FINAL PAYLOAD", payload);
+      const { data, error } = await supabase
+        .from("audits")
+        .insert({
+          team_size: parsed.data.teamSize,
+          tools_json: toolsPayload,
+          results_json: report,
+        })
+        .select("id")
+        .maybeSingle();
 
-      const insertResult = await insertAuditRow(supabase, payload);
-      if (!insertResult.ok) {
-        console.error("SUPABASE INSERT ERROR", insertResult.message);
-        setSubmitError(insertResult.message || "Could not save audit. Try again.");
+      if (error) {
+        setSubmitError(error.message || "Could not save audit. Try again.");
         return;
       }
-      console.log("SUPABASE INSERT SUCCESS", {
-        id: insertResult.id,
-        share_id: insertResult.shareId,
-      });
 
       saveAuditSessionPayload({
         version: 1,
         savedAt: new Date().toISOString(),
-        email: parsed.data.email,
         companyName: parsed.data.companyName,
         role: parsed.data.role,
         teamSize: parsed.data.teamSize,
         useCase: parsed.data.useCase,
         tools: parsed.data.tools,
         report,
-        auditRowId: insertResult.id,
-        shareId: insertResult.shareId,
+        auditRowId: data?.id ?? null,
       });
 
       router.push("/results");
@@ -156,28 +149,6 @@ export function AuditForm() {
 
       <GlassCard className="space-y-8">
         <div className="grid gap-8 md:grid-cols-2">
-          <div className="space-y-2 md:col-span-2">
-            <label htmlFor="email" className="text-sm font-medium text-white/80">
-              Work email
-            </label>
-            <input
-              id="email"
-              type="email"
-              placeholder="e.g. you@company.com"
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-lg text-white outline-none ring-blue-400/0 transition placeholder:text-white/35 focus:border-blue-400/40 focus:ring-2 focus:ring-blue-400/25"
-              {...form.register("email", {
-                required: "Email is required",
-                validate: (v) =>
-                  (typeof v === "string" &&
-                    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim())) ||
-                  "Enter a valid email",
-              })}
-            />
-            {errors.email ? (
-              <p className="text-sm text-rose-300/90">{errors.email.message}</p>
-            ) : null}
-          </div>
-
           <div className="space-y-2 md:col-span-2">
             <label htmlFor="companyName" className="text-sm font-medium text-white/80">
               Company name
@@ -280,7 +251,6 @@ export function AuditForm() {
           {anyEnabled
             ? `${TOOL_IDS.filter((id) => watchedTools[id]?.enabled).length} tool(s) enabled`
             : "Enable at least one tool to continue."}
-          {!emailValid ? " · Enter valid email." : null}
           {!companyNameValid ? " · Enter company name." : null}
           {!roleValid ? " · Enter your role." : null}
           {!teamSizeValid ? " · Enter a valid team size." : null}

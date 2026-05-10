@@ -42,7 +42,6 @@ export interface ToolFormValues {
 }
 
 export interface AuditFormValues {
-  email: string;
   companyName: string;
   role: string;
   teamSize: number;
@@ -58,23 +57,7 @@ export type RecommendationActionType =
   | "Reduce API Spend"
   | "Already Optimized";
 
-/** Spend vs list benchmark — independent of action type (downgrade vs usage, etc.). */
-export type SpendClassification =
-  | "Already Optimized"
-  | "Mild Optimization Opportunity"
-  | "Moderate Overspending"
-  | "Significant Overspending"
-  | "Potential Billing Anomaly";
-
 export type ConfidenceLevel = "High" | "Medium" | "Low";
-
-/** Four checks the engine runs for every enabled tool (finance-style transparency). */
-export interface AuditDimensionSummary {
-  planSuitability: string;
-  cheaperSameVendor: string;
-  alternativeTool: string;
-  creditsVsRetail: string;
-}
 
 export interface ToolAuditFinding {
   toolId: ToolId;
@@ -83,21 +66,13 @@ export interface ToolAuditFinding {
   recommendedTool: string;
   recommendedPlan: string;
   actionType: RecommendationActionType;
-  /** List-price benchmark monthly total for this plan × seats (null if not computable). */
-  benchmarkSpendMonthly: number | null;
-  /** actualSpend / benchmark when benchmark is meaningful (> 0). */
-  spendRatio: number | null;
-  spendClassification: SpendClassification;
   currentSpend: number;
   optimizedSpend: number;
   monthlySavings: number;
   annualSavings: number;
   confidenceLevel: ConfidenceLevel;
-  /** Single headline sentence for the card. */
-  oneSentenceReason: string;
   reasoning: string[];
   optimizationSummary: string;
-  dimensions: AuditDimensionSummary;
   potentialPricingAnomaly: boolean;
   recommendationBadges: RecommendationActionType[];
 }
@@ -113,15 +88,11 @@ export interface AuditReport {
   executiveSummary: string;
   summaryBullets: string[];
   isMostlyOptimized: boolean;
-  /** ISO date — aligns with PRICING_DATA.md */
-  pricingDataAsOf: string;
-  pricingDataReference: string;
 }
 
 export interface AuditSessionPayload {
   version: 1;
   savedAt: string;
-  email: string;
   companyName: string;
   role: string;
   teamSize: number;
@@ -129,27 +100,4 @@ export interface AuditSessionPayload {
   tools: Record<ToolId, ToolFormValues>;
   report: AuditReport;
   auditRowId: string | null;
-  shareId: string | null;
-}
-
-export interface EnabledToolPayload {
-  toolId: ToolId;
-  toolName: string;
-  planId: string;
-  planLabel: string;
-  monthlySpend: number;
-  seats: number;
-}
-
-export interface AuditInsertPayload {
-  email: string;
-  company_name: string;
-  role: string;
-  team_size: number;
-  tools_json: {
-    useCase: UseCase;
-    enabledTools: EnabledToolPayload[];
-  };
-  results_json: AuditReport;
-  share_id: string;
 }
