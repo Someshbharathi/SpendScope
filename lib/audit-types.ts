@@ -49,45 +49,34 @@ export interface AuditFormValues {
   tools: Record<ToolId, ToolFormValues>;
 }
 
-export type RecommendationActionType =
-  | "Downgrade Plan"
-  | "Alternative Tool"
-  | "Optimize Seats"
-  | "Use Credits"
-  | "Reduce API Spend"
-  | "Already Optimized";
-
-export type ConfidenceLevel = "High" | "Medium" | "Low";
+export interface AlternativeToolSuggestion {
+  toolId: ToolId;
+  displayName: string;
+  reason: string;
+  estimatedMonthlySavings: number;
+}
 
 export interface ToolAuditFinding {
   toolId: ToolId;
-  currentTool: string;
-  currentPlan: string;
-  recommendedTool: string;
-  recommendedPlan: string;
-  actionType: RecommendationActionType;
-  currentSpend: number;
-  optimizedSpend: number;
+  toolName: string;
+  currentPlanLabel: string;
+  recommendedPlanLabel: string | null;
+  monthlySpendReported: number;
+  monthlySpendAfterRecommendation: number;
   monthlySavings: number;
   annualSavings: number;
-  confidenceLevel: ConfidenceLevel;
-  reasoning: string[];
-  optimizationSummary: string;
-  potentialPricingAnomaly: boolean;
-  recommendationBadges: RecommendationActionType[];
+  reasons: string[];
+  overspendingDetected: boolean;
+  alternativeTool: AlternativeToolSuggestion | null;
 }
 
 export interface AuditReport {
-  companyName: string;
-  role: string;
   teamSize: number;
   useCase: UseCase;
   findings: ToolAuditFinding[];
   totalMonthlySavings: number;
   totalAnnualSavings: number;
-  executiveSummary: string;
   summaryBullets: string[];
-  isMostlyOptimized: boolean;
 }
 
 export interface AuditSessionPayload {
