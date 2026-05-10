@@ -141,10 +141,10 @@ Because of that, I could not start the project on the first day.
 
 ---
 
-## Day 4 — 2026-05-09
+## Day 5 — 2026-05-10
 
 ### Hours worked
-7–8 hours
+7 hours
 
 ### What I did
 - Built the AI spend audit form page

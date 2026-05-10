@@ -3,6 +3,7 @@ import { formatCurrency } from "@/lib/format-currency";
 
 export type AuditReportEmailContent = {
   shareUrl: string;
+  /** Personalized executive narrative (same text as on-page AI brief). */
   executiveSummary: string;
   monthlySavings: number;
   annualSavings: number;
@@ -17,6 +18,31 @@ function renderBullets(items: string[]): string {
     .map((line) => `<li style="margin:0 0 8px;font-size:14px;line-height:1.55;color:#334155;">${escapeHtml(line)}</li>`)
     .join("");
   return `<ul style="margin:0 0 16px;padding-left:20px;color:#334155;">${lis}</ul>`;
+}
+
+export function buildAuditReportPlainText(content: AuditReportEmailContent): string {
+  const summary = content.executiveSummary.trim();
+  const monthly = formatCurrency(content.monthlySavings);
+  const annual = formatCurrency(content.annualSavings);
+  const lines = [
+    "SpendScope — Your AI Audit Report",
+    "",
+    "PERSONALIZED EXECUTIVE SUMMARY",
+    summary,
+    "",
+    `Modeled monthly savings opportunity: ${monthly}`,
+    `Modeled annual savings opportunity: ${annual}`,
+    "",
+    "Top recommendations:",
+    ...(content.topRecommendations.length > 0
+      ? content.topRecommendations.map((r) => `• ${r}`)
+      : ["• No specific recommendations were highlighted on this pass."]),
+    "",
+    `View full report: ${content.shareUrl}`,
+    "",
+    "This summary uses published retail benchmarks and the inputs from your audit—validate against contracts before renewal decisions.",
+  ];
+  return lines.join("\n");
 }
 
 export function buildAuditReportEmailHtml(content: AuditReportEmailContent): string {
@@ -45,7 +71,8 @@ export function buildAuditReportEmailHtml(content: AuditReportEmailContent): str
           </tr>
           <tr>
             <td style="padding:28px;">
-              <p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:#cbd5e1;">${summary}</p>
+              <p style="margin:0 0 8px;font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:#94a3b8;">Personalized executive summary</p>
+              <p style="margin:0 0 22px;font-size:15px;line-height:1.65;color:#e2e8f0;">${summary}</p>
 
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;border-radius:10px;background-color:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">
                 <tr>

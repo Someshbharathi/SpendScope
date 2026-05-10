@@ -130,6 +130,9 @@ export interface AuditSessionPayload {
   report: AuditReport;
   auditRowId: string | null;
   shareId: string | null;
+  /** Cached Gemini narrative; invalidated when `aiSummaryForSavedAt !== savedAt`. */
+  aiExecutiveSummary?: string | null;
+  aiSummaryForSavedAt?: string | null;
 }
 
 export interface EnabledToolPayload {

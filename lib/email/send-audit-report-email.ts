@@ -1,6 +1,10 @@
 import { Resend } from "resend";
 
-import { buildAuditReportEmailHtml, type AuditReportEmailContent } from "@/lib/email/report-email-html";
+import {
+  buildAuditReportEmailHtml,
+  buildAuditReportPlainText,
+  type AuditReportEmailContent,
+} from "@/lib/email/report-email-html";
 
 export type SendAuditReportEmailParams = AuditReportEmailContent & {
   to: string;
@@ -26,19 +30,23 @@ export async function sendAuditReportEmail(params: SendAuditReportEmailParams): 
   }
 
   const resend = new Resend(apiKey);
-  const html = buildAuditReportEmailHtml({
+  const emailContent: AuditReportEmailContent = {
     shareUrl: params.shareUrl,
     executiveSummary: params.executiveSummary,
     monthlySavings: params.monthlySavings,
     annualSavings: params.annualSavings,
     topRecommendations: params.topRecommendations,
-  });
+  };
+
+  const html = buildAuditReportEmailHtml(emailContent);
+  const text = buildAuditReportPlainText(emailContent);
 
   const { data, error } = await resend.emails.send({
     from: getResendFrom(),
     to: params.to,
     subject: "Your SpendScope AI Audit Report",
     html,
+    text,
   });
 
   if (error) {

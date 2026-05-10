@@ -8,6 +8,7 @@ import { isResendConfigured, sendAuditReportEmail } from "@/lib/email/send-audit
 const bodySchema = z.object({
   email: z.string().trim().email().max(320),
   share_id: z.string().trim().min(1).max(36),
+  /** Personalized executive narrative (Gemini or deterministic fallback) — shown as email body lead. */
   executive_summary: z.string().trim().max(8000),
   monthly_savings: z.number().finite(),
   annual_savings: z.number().finite(),

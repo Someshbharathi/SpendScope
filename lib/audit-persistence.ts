@@ -156,6 +156,15 @@ export function loadAuditSessionPayload(): AuditSessionPayload | null {
       data.auditRowId === null || typeof data.auditRowId === "string"
         ? data.auditRowId
         : null;
+    const aiExecutiveSummary =
+      typeof data.aiExecutiveSummary === "string" && data.aiExecutiveSummary.trim().length > 0
+        ? data.aiExecutiveSummary.trim()
+        : undefined;
+    const aiSummaryForSavedAt =
+      typeof data.aiSummaryForSavedAt === "string" && data.aiSummaryForSavedAt.trim().length > 0
+        ? data.aiSummaryForSavedAt.trim()
+        : undefined;
+
     return {
       version: 1,
       savedAt: data.savedAt,
@@ -169,6 +178,8 @@ export function loadAuditSessionPayload(): AuditSessionPayload | null {
       auditRowId,
       shareId:
         data.shareId === null || typeof data.shareId === "string" ? data.shareId : null,
+      ...(aiExecutiveSummary !== undefined ? { aiExecutiveSummary } : {}),
+      ...(aiSummaryForSavedAt !== undefined ? { aiSummaryForSavedAt } : {}),
     };
   } catch {
     return null;
