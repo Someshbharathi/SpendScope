@@ -2,7 +2,7 @@
 
 import { startTransition, useEffect, useId, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
-import { ArrowRight, Loader2 } from "lucide-react";
+import { ArrowRight, Loader2, Share2 } from "lucide-react";
 
 import { AppShell } from "@/components/app-shell";
 import { AuditTopNav } from "@/components/audit/audit-top-nav";
@@ -14,6 +14,14 @@ import type {
   ToolAuditFinding,
 } from "@/lib/audit-types";
 import { loadAuditSessionPayload } from "@/lib/audit-persistence";
+import {
+  narrativeFinancialContext,
+  narrativePlanEyebrow,
+  narrativeProblem,
+  narrativeSeverityLabel,
+  narrativeWhatToReview,
+  savingsHeadline,
+} from "@/lib/results-narrative";
 
 function formatCurrency(n: number): string {
   return new Intl.NumberFormat("en-US", {
@@ -119,17 +127,18 @@ function SpendOverviewCharts({
   return (
     <section
       className="mb-10 rounded-xl border border-white/10 bg-white/4 p-5"
-      aria-label="Spend and modeled savings overview"
+      aria-label="Spend outlook"
     >
-      <p className="text-[10px] font-semibold uppercase tracking-wider text-white/40">Spend vs modeled after</p>
+      <p className="text-[10px] font-semibold uppercase tracking-wider text-white/40">Spend outlook</p>
       <p className="mt-1 text-xs leading-relaxed text-white/45">
-        Stack-wide reported monthly spend vs modeled monthly run-rate after the recommendations below.
+        How your reported stack compares to an optimized retail run-rate—same methodology finance teams use for renewal
+        prep.
       </p>
 
       <div className="mt-5 space-y-4">
         <div>
           <div className="mb-1.5 flex justify-between gap-2 text-xs">
-            <span className="text-white/55">Current (reported)</span>
+            <span className="text-white/55">Your stack today</span>
             <span className="shrink-0 tabular-nums font-medium text-white/90">{formatCurrency(currentMonthly)}/mo</span>
           </div>
           <div className="h-3 overflow-hidden rounded-full bg-white/10">
@@ -141,7 +150,7 @@ function SpendOverviewCharts({
         </div>
         <div>
           <div className="mb-1.5 flex justify-between gap-2 text-xs">
-            <span className="text-white/55">After (modeled)</span>
+            <span className="text-white/55">Optimized estimate</span>
             <span className="shrink-0 tabular-nums font-medium text-emerald-300">{formatCurrency(optimizedMonthly)}/mo</span>
           </div>
           <div className="h-3 overflow-hidden rounded-full bg-white/10">
@@ -154,14 +163,16 @@ function SpendOverviewCharts({
       </div>
 
       {monthlySavings > 0 ? (
-        <p className="mt-4 text-center text-xs text-white/50">
-          Modeled gap:{" "}
-          <span className="font-semibold text-emerald-300">{formatCurrency(monthlySavings)}/mo</span>
-          {" · "}
-          <span className="text-white/45">{formatCurrency(annualSavings)} over 12 mo</span>
+        <p className="mt-4 text-center text-sm text-white/55">
+          <span className="font-medium text-emerald-300/95">Potential opportunity:</span> save about{" "}
+          <span className="font-semibold tabular-nums text-emerald-300">{formatCurrency(monthlySavings)}</span>/month (
+          <span className="tabular-nums text-white/50">{formatCurrency(annualSavings)}</span> over 12 months at current
+          trajectory).
         </p>
       ) : (
-        <p className="mt-4 text-center text-xs text-white/45">No modeled monthly gap for this audit snapshot.</p>
+        <p className="mt-4 text-center text-xs text-white/45">
+          No material gap surfaced between reported spend and this retail benchmark pass.
+        </p>
       )}
 
       <div className="mt-6 border-t border-white/10 pt-5">
@@ -169,18 +180,17 @@ function SpendOverviewCharts({
           Cumulative spend (12 months)
         </p>
         <p className="mt-1 text-xs text-white/45">
-          Straight-line model: same monthly spend each month, stacked through December. Shaded band is modeled savings
-          vs staying on today&apos;s trajectory.
+          Same monthly cadence through year-end—useful for directional planning, not a forecast.
         </p>
 
         <div className="mt-4 flex flex-wrap items-center justify-center gap-6 text-xs text-white/60">
           <span className="inline-flex items-center gap-2">
             <span className="h-2 w-2 shrink-0 rounded-full bg-slate-400" aria-hidden />
-            Current trajectory
+            Reported trajectory
           </span>
           <span className="inline-flex items-center gap-2">
             <span className="h-2 w-2 shrink-0 rounded-full bg-sky-400" aria-hidden />
-            Optimized path
+            Optimized trajectory
           </span>
         </div>
 
@@ -300,7 +310,7 @@ function SpendOverviewCharts({
                       fontSize="10"
                       fontFamily="ui-sans-serif, system-ui, sans-serif"
                     >
-                      {`Current trajectory: ${curRounded.toLocaleString("en-US")}`}
+                      {`Reported: ${curRounded.toLocaleString("en-US")}`}
                     </text>
                     <text
                       x="10"
@@ -309,7 +319,7 @@ function SpendOverviewCharts({
                       fontSize="10"
                       fontFamily="ui-sans-serif, system-ui, sans-serif"
                     >
-                      {`Optimized path: ${optRounded.toLocaleString("en-US")}`}
+                      {`Optimized estimate: ${optRounded.toLocaleString("en-US")}`}
                     </text>
                   </g>
                 </g>
@@ -374,89 +384,123 @@ function actionAccentClass(action: RecommendationActionType): string {
   }
 }
 
-function isDryPricingWorksheetLine(line: string): boolean {
-  const t = line.trim();
-  if (/^List math:/i.test(t)) return true;
-  if (/^Downgrade target at list:/i.test(t)) return true;
-  if (/^Vendor list benchmark:/i.test(t)) return true;
-  if (/^Comparable list spend for this configuration/i.test(t)) return true;
-  if (/^See vendor list pricing:/i.test(t)) return true;
-  return false;
-}
+function ActionPlanCard({
+  finding,
+  teamSize,
+}: {
+  finding: ToolAuditFinding;
+  teamSize: number;
+}) {
+  const hasSavings = finding.monthlySavings > 0;
+  const severity = narrativeSeverityLabel(finding.spendClassification);
+  const eyebrow = narrativePlanEyebrow(finding);
+  const checklist = narrativeWhatToReview(finding);
 
-/** One neutral line above the plan comparison — no marketing headline. */
-function alternativePanelIntro(action: RecommendationActionType): string {
-  switch (action) {
-    case "Downgrade Plan":
-      return "Same vendor — a plan that fits how many seats you actually need.";
-    case "Alternative Tool":
-      return "Different vendor or plan. Figures compare list pricing for the alternative to your reported spend.";
-    case "Optimize Seats":
-      return 'Paid seats exceed team size: the "After" column reflects fewer seats at the implied per-seat rate you reported.';
-    case "Use Credits":
-      return "Effective spend after credits, commits, and usage controls vs paying full retail run-rate.";
-    case "Reduce API Spend":
-      return 'Reported spend above list benchmark: the modeled "After" run-rate assumes usage and billing hygiene.';
-    default:
-      return "No stronger change modeled at public list rates for this line item.";
-  }
-}
+  return (
+    <div
+      className={`rounded-xl border border-white/10 bg-white/4 py-5 pl-5 pr-5 sm:pl-6 ${actionAccentClass(finding.actionType)}`}
+    >
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0 space-y-2">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/40">{eyebrow}</p>
+          <div className="flex flex-wrap items-center gap-2">
+            <h3 className="text-lg font-semibold tracking-tight text-white">{finding.currentTool}</h3>
+            {finding.actionType !== "Already Optimized" && severity ? (
+              <span className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-[11px] font-medium text-white/55">
+                {severity}
+              </span>
+            ) : null}
+          </div>
+        </div>
+        <div className="shrink-0 text-left sm:text-right">
+          {hasSavings ? (
+            <div className="rounded-xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-3 sm:border-0 sm:bg-transparent sm:p-0">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-200/75">Potential savings</p>
+              <p className="mt-1 text-xl font-semibold tabular-nums text-emerald-300">
+                Save ~{formatCurrency(finding.monthlySavings)}/mo
+              </p>
+              <p className="text-xs text-emerald-200/65">~{formatCurrency(finding.annualSavings)} per year</p>
+            </div>
+          ) : (
+            <p className="text-sm font-medium leading-snug text-white/50">
+              No major gap vs retail in this pass
+            </p>
+          )}
+        </div>
+      </div>
 
-/** Bottom line: direct, imperative — not a button, plain copy. */
-function imperativeCallout(finding: ToolAuditFinding): string | null {
-  if (finding.actionType === "Already Optimized") return null;
-  switch (finding.actionType) {
-    case "Downgrade Plan":
-      return `A move to ${finding.recommendedPlan} may fit better than ${finding.currentPlan} at published list rates for your seats — worth confirming before renewal.`;
-    case "Alternative Tool":
-      return `${finding.recommendedTool} is worth a look for this workload; list pricing may sit more comfortably than your current line.`;
-    case "Optimize Seats":
-      return "If paid seats exceed active headcount, trimming to match can lower cost without changing vendors.";
-    case "Use Credits":
-      return "Credits, commits, and billing hygiene can bring effective spend closer to list — useful to review before the next invoice.";
-    case "Reduce API Spend":
-      return "Usage, add-ons, and API spend are the usual levers when run-rate sits above list benchmark — a good topic for your next finance pass.";
-    default:
-      return null;
-  }
-}
+      <div className="mt-6 space-y-5 border-t border-white/10 pt-5">
+        <section>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/38">What we&apos;re seeing</p>
+          <p className="mt-2 text-sm leading-relaxed text-white/85">{narrativeProblem(finding, teamSize)}</p>
+        </section>
 
-/** Up to two short lines: what’s wrong with the current plan (or why it’s fine). */
-function actionPlanWhyLines(finding: ToolAuditFinding): string[] {
-  if (finding.actionType === "Already Optimized") {
-    const lines = [
-      "No meaningful list-price gap vs your reported spend and seat count.",
-      "Revisit at renewal if usage or team size shifts materially.",
-    ];
-    if (
-      finding.spendClassification &&
-      finding.spendClassification !== "Already Optimized" &&
-      finding.benchmarkSpendMonthly != null
-    ) {
-      lines[0] = `Spend runs above the ~${formatCurrency(finding.benchmarkSpendMonthly)}/mo list benchmark — we didn’t model a stronger same-vendor lever.`;
-    }
-    return lines;
-  }
-  const out: string[] = [];
-  const summary = finding.optimizationSummary?.trim();
-  if (summary && !isDryPricingWorksheetLine(summary)) out.push(summary);
-  for (const r of finding.reasoning) {
-    if (!r || isDryPricingWorksheetLine(r)) continue;
-    if (out.length >= 2) break;
-    if (r !== out[0]) out.push(r);
-  }
-  if (out.length === 0 && finding.oneSentenceReason && !isDryPricingWorksheetLine(finding.oneSentenceReason)) {
-    out.push(finding.oneSentenceReason);
-  }
-  if (out.length === 0) {
-    out.push(
-      `Your ${finding.currentPlan} line looks heavier than typical list pricing for this seat count — there’s room to tighten.`,
-    );
-  }
-  if (out.length === 1 && finding.monthlySavings > 0) {
-    out.push("Act before the next renewal so the lower run-rate sticks.");
-  }
-  return out.slice(0, 2);
+        <section>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/38">Financial context</p>
+          <p className="mt-2 text-sm leading-relaxed text-white/65">{narrativeFinancialContext(finding)}</p>
+        </section>
+
+        <section>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/38">What to review next</p>
+          <ul className="mt-2 list-none space-y-2 text-sm leading-relaxed text-white/75">
+            {checklist.map((item) => (
+              <li key={item} className="flex gap-2">
+                <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-emerald-400/70" aria-hidden />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      </div>
+
+      {finding.potentialPricingAnomaly ? (
+        <p className="mt-4 rounded-lg border border-amber-400/25 bg-amber-500/10 px-3 py-2 text-xs leading-relaxed text-amber-100/90">
+          This line stands out vs typical retail—reconcile invoices, API usage, and seat assignments before you renew.
+        </p>
+      ) : null}
+
+      <div className="mt-5 rounded-xl border border-white/10 bg-black/20 px-4 py-4">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/38">Spend comparison</p>
+        {finding.actionType === "Already Optimized" ? (
+          <div className="mt-3 max-w-md rounded-lg border border-white/10 bg-white/5 px-3 py-3">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-white/40">Current spend</p>
+            <p className="mt-1 text-lg font-semibold tabular-nums text-white">
+              {formatCurrency(finding.currentSpend)}
+              <span className="text-xs font-normal text-white/45">/mo</span>
+            </p>
+            <p className="mt-1 text-xs text-white/45">{finding.currentPlan}</p>
+          </div>
+        ) : (
+          <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-3">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-white/40">Current spend</p>
+              <p className="mt-1 text-lg font-semibold tabular-nums text-white">
+                {formatCurrency(finding.currentSpend)}
+                <span className="text-xs font-normal text-white/45">/mo</span>
+              </p>
+              <p className="mt-1 text-xs text-white/45">{finding.currentPlan}</p>
+            </div>
+            <div className="rounded-lg border border-emerald-400/25 bg-emerald-500/10 px-3 py-3">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-200/80">Optimized estimate</p>
+              <p className="mt-1 text-lg font-semibold tabular-nums text-emerald-300">
+                ~{formatCurrency(finding.optimizedSpend)}
+                <span className="text-xs font-normal text-emerald-200/65">/mo</span>
+              </p>
+              <p className="mt-1 text-xs text-emerald-200/70">{finding.recommendedPlan}</p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {hasSavings ? (
+        <div className="mt-4 rounded-xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-3">
+          <p className="text-sm font-medium text-emerald-100/95">{savingsHeadline(finding.monthlySavings, finding.annualSavings)}</p>
+          <p className="mt-1 text-xs text-emerald-200/55">Directional estimate from retail benchmarks—not a quote.</p>
+        </div>
+      ) : null}
+
+    </div>
+  );
 }
 
 function defaultDimensions(): AuditDimensionSummary {
@@ -522,102 +566,57 @@ function normalizeFinding(finding: ToolAuditFinding): ToolAuditFinding {
   };
 }
 
-function ActionPlanCard({ finding }: { finding: ToolAuditFinding }) {
-  const hasSavings = finding.monthlySavings > 0;
-  const why = actionPlanWhyLines(finding);
-  const panelIntro = alternativePanelIntro(finding.actionType);
-  const demand = imperativeCallout(finding);
+function ShareAuditReportButton({
+  shareTitle,
+  shareSummary,
+  monthlySavings,
+}: {
+  shareTitle: string;
+  shareSummary: string;
+  monthlySavings: number;
+}) {
+  const [status, setStatus] = useState<"idle" | "copied">("idle");
+
+  async function handleShare() {
+    if (typeof window === "undefined") return;
+    const url = window.location.href;
+    const savingsLine =
+      monthlySavings > 0
+        ? `Modeled opportunity: about ${formatCurrency(monthlySavings)}/month.`
+        : "No major savings gap modeled on this pass.";
+    const text = [shareSummary.trim(), savingsLine, url].filter(Boolean).join("\n\n");
+
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share({
+          title: shareTitle,
+          text: `${shareSummary.trim()}\n\n${savingsLine}`,
+          url,
+        });
+        return;
+      } catch (e) {
+        if (e instanceof Error && e.name === "AbortError") return;
+      }
+    }
+
+    try {
+      await navigator.clipboard.writeText(text);
+      setStatus("copied");
+      window.setTimeout(() => setStatus("idle"), 2000);
+    } catch {
+      setStatus("idle");
+    }
+  }
 
   return (
-    <div
-      className={`rounded-xl border border-white/10 bg-white/4 py-5 pl-5 pr-5 sm:pl-6 ${actionAccentClass(finding.actionType)}`}
+    <button
+      type="button"
+      onClick={handleShare}
+      className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm font-medium text-white/85 transition hover:border-white/25 hover:bg-white/10"
     >
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="min-w-0 space-y-1">
-          <h3 className="text-lg font-semibold tracking-tight text-white">{finding.currentTool}</h3>
-          <p className="text-sm text-white/50">
-            Current: <span className="text-white/80">{finding.currentPlan}</span>
-            {finding.benchmarkSpendMonthly != null ? (
-              <>
-                {" "}
-                · List benchmark ~{formatCurrency(finding.benchmarkSpendMonthly)}/mo
-              </>
-            ) : null}
-          </p>
-        </div>
-        <div className="shrink-0 text-left sm:text-right">
-          {hasSavings ? (
-            <p className="text-lg font-semibold tabular-nums text-emerald-400">
-              −{formatCurrency(finding.monthlySavings)}/mo
-            </p>
-          ) : (
-            <p className="text-sm font-medium text-white/40">$0 /mo</p>
-          )}
-          {hasSavings ? (
-            <p className="text-xs text-white/40">{formatCurrency(finding.annualSavings)} saved / yr</p>
-          ) : null}
-        </div>
-      </div>
-
-      <div className="mt-4 space-y-2 border-t border-white/10 pt-4">
-        {why.map((line) => (
-          <p key={line} className="text-sm leading-relaxed text-white/65">
-            {line}
-          </p>
-        ))}
-        {finding.potentialPricingAnomaly ? (
-          <p className="text-xs font-medium text-amber-200/90">
-            Flag: reconcile this line item against invoices, API overages, and seat assignments before renewal.
-          </p>
-        ) : null}
-      </div>
-
-      <div className="mt-4 rounded-lg border border-white/10 bg-white/3 px-4 py-3">
-        <p className="text-xs leading-relaxed text-white/55">{panelIntro}</p>
-
-        {finding.actionType === "Already Optimized" ? (
-          <p className="mt-3 text-sm font-medium text-white/75">
-            {finding.currentTool} · {finding.currentPlan} — ~{formatCurrency(finding.currentSpend)}/mo
-          </p>
-        ) : (
-          <>
-            <p className="mt-2 text-sm font-medium text-white/90">
-              {finding.recommendedTool} · {finding.recommendedPlan}
-            </p>
-            <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3">
-              <div className="rounded-lg border border-white/10 bg-black/25 px-3 py-2.5">
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-white/40">Today</p>
-                <p className="mt-0.5 text-base font-semibold tabular-nums text-white/80">
-                  {formatCurrency(finding.currentSpend)}
-                  <span className="text-xs font-normal text-white/45">/mo</span>
-                </p>
-                <p className="text-[11px] text-white/45">{finding.currentPlan}</p>
-              </div>
-              <div className="rounded-lg border border-emerald-400/25 bg-emerald-500/10 px-3 py-2.5">
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-200/80">After</p>
-                <p className="mt-0.5 text-base font-semibold tabular-nums text-emerald-300">
-                  ~{formatCurrency(finding.optimizedSpend)}
-                  <span className="text-xs font-normal text-emerald-200/70">/mo</span>
-                </p>
-                <p className="text-[11px] text-emerald-200/65">{finding.recommendedPlan}</p>
-              </div>
-            </div>
-            {hasSavings ? (
-              <p className="mt-3 text-xs leading-relaxed text-white/55">
-                <span className="font-semibold text-emerald-300">~{formatCurrency(finding.monthlySavings)}/mo</span>{" "}
-                modeled vs staying on today&apos;s run-rate (list-based estimate).
-              </p>
-            ) : null}
-          </>
-        )}
-      </div>
-
-      {demand ? (
-        <p className="mt-4 border-t border-white/10 pt-4 text-sm font-medium leading-relaxed text-white/65">
-          {demand}
-        </p>
-      ) : null}
-    </div>
+      <Share2 className="h-4 w-4 shrink-0 opacity-80" aria-hidden />
+      {status === "copied" ? "Copied to clipboard" : "Share report"}
+    </button>
   );
 }
 
@@ -629,14 +628,14 @@ function NotifyOptimizationForm({ defaultEmail }: { defaultEmail: string }) {
     e.preventDefault();
     const trimmed = email.trim();
     if (!trimmed) return;
-    console.log("[Credex] Notify optimization signup", { email: trimmed });
+    console.log("[SpendScope] Audit report email requested", { email: trimmed });
     setSubmitted(true);
   }
 
   if (submitted) {
     return (
       <p className="text-sm text-emerald-200/90">
-        You&apos;re on the list — we&apos;ll notify you when new optimizations match your stack.
+        Thanks — we&apos;ll email your detailed audit report to that address shortly.
       </p>
     );
   }
@@ -660,7 +659,7 @@ function NotifyOptimizationForm({ defaultEmail }: { defaultEmail: string }) {
         type="submit"
         className="shrink-0 rounded-full bg-white px-6 py-3 text-sm font-semibold text-[#0B0F19] transition hover:bg-white/95"
       >
-        Notify me
+        Email me the report
       </button>
     </form>
   );
@@ -723,8 +722,6 @@ export function ResultsClient() {
   const executiveSummary =
     report.executiveSummary ??
     "Your spend profile has been analyzed against pricing benchmarks and optimization rules.";
-  const pricingAsOf = report.pricingDataAsOf ?? "—";
-  const pricingRef = report.pricingDataReference ?? "See PRICING_DATA.md for vendor URLs and list prices.";
 
   const totalMonthly = report.totalMonthlySavings;
   const totalAnnual = report.totalAnnualSavings;
@@ -732,6 +729,7 @@ export function ResultsClient() {
   const totalOptimizedSpend = Math.max(0, safeFindings.reduce((sum, f) => sum + f.optimizedSpend, 0));
   const lowSavings = totalMonthly < 100;
   const highSavings = totalMonthly >= 500;
+  const noModeledSavings = totalMonthly <= 0;
 
   const execSnippet = executiveSummary
     .split(/(?<=[.!?])\s+/)
@@ -746,31 +744,50 @@ export function ResultsClient() {
       <main className="mx-auto w-full max-w-xl px-6 pb-24 pt-8 md:max-w-3xl md:px-8">
         <header className="mb-10 space-y-4">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-violet-300/75">Audit results</p>
-          <h1 className="text-balance text-3xl font-semibold leading-tight tracking-tight text-white md:text-4xl">
-            You can save{" "}
-            <span className="bg-linear-to-r from-violet-400 via-fuchsia-400 to-sky-400 bg-clip-text text-transparent">
-              {formatCurrency(totalMonthly)}
-            </span>
-            <span className="text-white/90">/month</span>
-          </h1>
-          <p className="text-sm leading-relaxed text-white/55">{execSnippet || executiveSummary}</p>
+          {noModeledSavings ? (
+            <>
+              <h1 className="text-balance text-3xl font-semibold leading-tight tracking-tight text-white md:text-4xl">
+                Your stack looks efficient at retail pricing
+              </h1>
+              <p className="text-sm leading-relaxed text-white/55">
+                We didn&apos;t surface a material gap versus published pricing for what you entered—rerun when seats or
+                usage shifts meaningfully.
+              </p>
+            </>
+          ) : (
+            <>
+              <h1 className="text-balance text-3xl font-semibold leading-tight tracking-tight text-white md:text-4xl">
+                About{" "}
+                <span className="bg-linear-to-r from-violet-400 via-fuchsia-400 to-sky-400 bg-clip-text text-transparent">
+                  {formatCurrency(totalMonthly)}
+                </span>
+                <span className="text-white/90">/month</span> on the table
+              </h1>
+              <p className="text-sm leading-relaxed text-white/55">
+                {execSnippet || executiveSummary}{" "}
+                <span className="text-white/40">
+                  Based on published retail benchmarks and the plans and seats you shared—not a vendor quote.
+                </span>
+              </p>
+            </>
+          )}
         </header>
 
         <div className="mb-10 grid grid-cols-1 gap-3 sm:grid-cols-3">
           <div className="rounded-xl border border-white/10 bg-white/4 px-4 py-4 text-center sm:text-left">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-white/40">Current spend</p>
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-white/40">Total reported spend</p>
             <p className="mt-1 text-lg font-semibold tabular-nums text-white">{formatCurrency(totalCurrentSpend)}</p>
-            <p className="text-xs text-white/40">per month (reported)</p>
+            <p className="text-xs text-white/40">Per month across enabled tools</p>
           </div>
           <div className="rounded-xl border border-white/10 bg-white/4 px-4 py-4 text-center sm:text-left">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-white/40">Monthly savings</p>
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-white/40">Potential monthly savings</p>
             <p className="mt-1 text-lg font-semibold tabular-nums text-emerald-400">{formatCurrency(totalMonthly)}</p>
-            <p className="text-xs text-white/40">modeled optimized</p>
+            <p className="text-xs text-white/40">Retail benchmark opportunity</p>
           </div>
           <div className="rounded-xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-4 text-center sm:text-left">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-200/70">Annual savings</p>
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-200/70">Potential annual impact</p>
             <p className="mt-1 text-xl font-semibold tabular-nums text-emerald-200">{formatCurrency(totalAnnual)}</p>
-            <p className="text-xs text-emerald-200/50">12-mo run-rate</p>
+            <p className="text-xs text-emerald-200/50">If monthly improvements hold</p>
           </div>
         </div>
 
@@ -782,12 +799,17 @@ export function ResultsClient() {
         />
 
         <div className="mb-4 flex items-end justify-between gap-4">
-          <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-white/45">Action plan</h2>
+          <div>
+            <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-white/45">Recommendations</h2>
+            <p className="mt-1 text-xs text-white/35">
+              Grounded in retail benchmarks—prioritized by impact on your stack.
+            </p>
+          </div>
         </div>
 
         <div className="space-y-4">
           {safeFindings.map((finding) => (
-            <ActionPlanCard key={finding.toolId} finding={finding} />
+            <ActionPlanCard key={finding.toolId} finding={finding} teamSize={payload.teamSize} />
           ))}
         </div>
 
@@ -801,14 +823,17 @@ export function ResultsClient() {
 
         {lowSavings ? (
           <GlassCard className="mt-8 border-white/10 bg-white/4 p-5">
-            <p className="text-sm font-medium text-white/85">Stay on the list</p>
-            <p className="mt-1 text-xs text-white/50">
-              We&apos;ll email when new benchmarks fit your stack. Low modeled savings means we&apos;re not inflating
-              numbers.
+            <p className="text-sm font-medium text-white/85">
+              We&apos;ll send a detailed copy of your audit report to your email.
             </p>
             <div className="mt-4">
               <NotifyOptimizationForm defaultEmail={payload.email} />
             </div>
+            <ShareAuditReportButton
+              shareTitle="SpendScope audit results"
+              shareSummary={execSnippet || executiveSummary}
+              monthlySavings={totalMonthly}
+            />
           </GlassCard>
         ) : null}
 
@@ -823,17 +848,12 @@ export function ResultsClient() {
           </p>
         ) : null}
 
-        <p className="mt-10 text-center text-[11px] leading-relaxed text-white/30">
-          Benchmarks as of {pricingAsOf}. {pricingRef}
+        <p className="mt-10 max-w-lg mx-auto text-center text-[11px] leading-relaxed text-white/38">
+          Recommendations use published retail benchmarks and the seats and plans you entered—validate against invoices
+          before renewal.
         </p>
 
-        <div className="mt-8 flex flex-col items-stretch gap-3 border-t border-white/10 pt-8 sm:flex-row sm:items-center sm:justify-between">
-          <Link
-            href="/audit"
-            className="text-center text-sm text-white/50 underline-offset-4 transition hover:text-white hover:underline sm:text-left"
-          >
-            Edit audit inputs
-          </Link>
+        <div className="mt-8 flex flex-col items-stretch gap-3 border-t border-white/10 pt-8 sm:flex-row sm:items-center sm:justify-center">
           <Link
             href="/"
             className="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm text-white/80 transition hover:border-white/25 hover:bg-white/10"
