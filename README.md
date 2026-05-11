@@ -55,16 +55,48 @@ https://your-vercel-url.vercel.app
 # Screenshots
 
 ## Landing Page
-(Add screenshot here)
+![SpendScope landing page](public/screenshots/landing-page.png)
 
 ## Audit Form
-(Add screenshot here)
+![SpendScope audit form details](public/screenshots/audit-form-details.png)
+
+![SpendScope audit form tools](public/screenshots/audit-form-tools.png)
 
 ## Audit Results Page
-(Add screenshot here)
+![SpendScope audit results overview](public/screenshots/audit-results-overview.png)
+
+![SpendScope audit results recommendations](public/screenshots/audit-results-recommendations.png)
+
+![SpendScope audit results actions](public/screenshots/audit-results-actions.png)
 
 ## Shareable Audit Report
-(Add screenshot here)
+![SpendScope share report share dialog](public/screenshots/share-report-share-dialog.png)
+
+![SpendScope share report URL](public/screenshots/share-report-url.png)
+
+![SpendScope share report overview](public/screenshots/share-report-overview.png)
+
+![SpendScope share report recommendation one](public/screenshots/share-report-recommendation-one.png)
+
+![SpendScope share report recommendation two](public/screenshots/share-report-recommendation-two.png)
+
+## Email Report
+![SpendScope email report form](public/screenshots/email-report-form.png)
+
+![SpendScope email report sent confirmation](public/screenshots/email-report-sent.png)
+
+![SpendScope email report inbox](public/screenshots/email-report-inbox.png)
+
+![SpendScope email report opened](public/screenshots/email-report-opened.png)
+
+![SpendScope email report body](public/screenshots/email-report-body.png)
+
+![SpendScope email report linked audit](public/screenshots/email-report-linked-audit.png)
+
+## Downloadable Report
+![SpendScope downloadable report button](public/screenshots/downloadable-report-button.png)
+
+![SpendScope downloadable report print dialog](public/screenshots/downloadable-report-print-dialog.png)
 
 ---
 

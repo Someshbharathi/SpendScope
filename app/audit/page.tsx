@@ -5,7 +5,7 @@ import { AuditForm } from "@/components/audit/audit-form";
 import { AuditTopNav } from "@/components/audit/audit-top-nav";
 
 export const metadata: Metadata = {
-  title: "Run audit — Credex Spend Audit",
+  title: "Run audit — SpendScope Spend Audit",
   description: "Submit your AI tool spend and receive savings recommendations.",
 };
 

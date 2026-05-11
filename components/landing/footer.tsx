@@ -13,7 +13,7 @@ export function Footer() {
         <div>
           <Logo labelClassName="text-xl font-semibold" />
           <p className="mt-4 max-w-sm text-sm leading-7 text-white/65">
-            Credex helps teams uncover AI software waste, consolidate overlapping
+            SpendScope helps teams uncover AI software waste, consolidate overlapping
             tools, and recover budget with continuous spend intelligence.
           </p>
         </div>
@@ -36,7 +36,7 @@ export function Footer() {
       </div>
       <div className="mx-auto mt-14 flex w-full max-w-7xl items-center justify-between border-t border-white/10 pt-6">
         <p className="text-xs text-white/50">
-          Copyright {new Date().getFullYear()} Credex. All rights reserved.
+          Copyright {new Date().getFullYear()} SpendScope. All rights reserved.
         </p>
         <div className="flex items-center gap-3">
           <a

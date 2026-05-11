@@ -8,12 +8,12 @@ const faqItems = [
   {
     question: "How does the audit process work?",
     answer:
-      "Credex connects to your workspace and finance tools in read-only mode, maps AI subscriptions to team usage, and highlights duplicate or underused licenses with recommended actions.",
+      "SpendScope connects to your workspace and finance tools in read-only mode, maps AI subscriptions to team usage, and highlights duplicate or underused licenses with recommended actions.",
   },
   {
     question: "Is my financial data secure?",
     answer:
-      "Yes. Data connections are encrypted in transit and at rest, and Credex only requests scoped read permissions needed to generate your spend analysis.",
+      "Yes. Data connections are encrypted in transit and at rest, and SpendScope only requests scoped read permissions needed to generate your spend analysis.",
   },
   {
     question: "Which tools do you detect?",

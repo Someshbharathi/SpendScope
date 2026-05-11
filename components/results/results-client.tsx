@@ -480,7 +480,7 @@ function AuditResultsReport({ payload }: { payload: AuditSessionPayload }) {
               href="/audit"
               className="font-medium text-cyan-300 underline-offset-2 transition hover:text-cyan-200 hover:underline"
             >
-              Explore infrastructure credits (Credex)
+              Explore infrastructure credits (SpendScope)
             </Link>
           </p>
         ) : null}

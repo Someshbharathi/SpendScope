@@ -35,7 +35,7 @@ export function HeroSection() {
             on AI Tools
           </h1>
           <p className="mx-auto max-w-2xl text-lg leading-8 text-white/70 md:mx-0 md:text-xl">
-            Credex Spend Audit automatically scans your stack to find hidden AI
+            SpendScope Spend Audit automatically scans your stack to find hidden AI
             subscriptions, duplicate tools, and unused licenses. Optimize your
             team&apos;s SaaS spending in seconds.
           </p>

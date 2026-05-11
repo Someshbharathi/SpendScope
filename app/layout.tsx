@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Credex Spend Audit",
+  title: "SpendScope Spend Audit",
   description: "Stop overspending on AI tools with automated spend audits.",
 };
 
