@@ -147,48 +147,43 @@ Because of that, I could not start the project on the first day.
 7 hours
 
 ### What I did
-- Built the AI spend audit form page
-- Added support for:
-  - ChatGPT
-  - Claude
-  - Cursor
-  - GitHub Copilot
-  - Gemini
-- Implemented tool toggles, plan selection, spend inputs, and seat inputs
-- Built the core audit engine logic
-- Added benchmark-based pricing comparisons
-- Implemented:
-  - overspending detection
-  - plan optimization logic
-  - recommendation generation
-  - estimated savings calculations
-- Built the audit results page
-- Added:
-  - executive summaries
-  - optimization recommendations
-  - confidence levels
-  - benchmark reasoning
-  - savings breakdown cards
-- Improved recommendation realism and financial reasoning
-- Fixed Supabase insert flow and audit persistence
-- Generated share IDs for saved audits
-- Improved UI polish and card layouts
+- Implemented public shareable audit report pages using dynamic routing
+- Added `/audit/[share_id]` public report flow
+- Connected shared reports with Supabase persistence
+- Implemented copy share link functionality
+- Added email delivery flow for audit reports
+- Integrated Resend for transactional email sending
+- Added downloadable audit report support
+- Implemented AI-generated personalized executive summaries
+- Integrated Gemini API for executive summary generation
+- Added graceful fallback summaries for API failures
+- Improved recommendation messaging and financial reasoning tone
+- Refined audit result explanations to feel more consultant-style and trustworthy
+- Improved savings framing and optimization narrative
+- Added GitHub Actions CI workflow
+- Created architecture documentation and Mermaid system flowchart
+- Improved production-level project structure and documentation organization
+- Polished UI consistency and report readability
 
 ### What I learned
-- Financial recommendation logic design
-- Benchmark-based pricing evaluation
-- JSON-based audit result storage
-- Realistic SaaS audit UX patterns
-- Structuring defensible optimization recommendations
+- Gemini API integration and prompt engineering
+- Transactional email workflows using Resend
+- Public report sharing architecture in Next.js
+- Dynamic routing and read-only report rendering
+- CI/CD workflows using GitHub Actions
+- Executive-style financial summary generation
+- SaaS product documentation structuring
+- Fallback handling for external AI APIs
 
 ### Blockers / What I'm stuck on
-- Fine-tuning recommendation thresholds for realistic savings detection
-- Improving edge-case handling for unusual pricing inputs
+- Fine-tuning AI-generated summaries for maximum consistency
+- Improving edge-case handling for unusual audit inputs
+- Finalizing documentation and production polish
 
 ### Plan for tomorrow
-- Add public shareable audit pages
-- Improve audit result accuracy
-- Add Open Graph metadata
-- Write documentation files
-- Add testing and deployment polish
+- Complete remaining documentation files
+- Add screenshots and deployment links to README
+- Finalize TESTS.md and REFLECTION.md
+- Verify full production flow end-to-end
+- Final deployment and submission polish
 - Finalize the project for submission
