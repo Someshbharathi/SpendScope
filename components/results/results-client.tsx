@@ -319,7 +319,7 @@ function AuditResultsReport({ payload }: { payload: AuditSessionPayload }) {
   return (
     <AppShell>
       <AuditTopNav />
-      <main className="mx-auto w-full max-w-xl px-6 pb-24 pt-8 print:max-w-none print:[print-color-adjust:exact] print:px-4 print:pb-8 print:pt-4 md:max-w-3xl md:px-8">
+      <main className="mx-auto w-full max-w-xl px-6 pb-24 pt-8 print:m-0 print:max-w-none print:bg-[#0B0F19] print:p-0 print:[print-color-adjust:exact] md:max-w-3xl md:px-8">
         <header className="relative mb-10 print:mb-6">
           <div
             className="pointer-events-none absolute -right-10 -top-10 h-64 w-64 rounded-full bg-[radial-gradient(circle_at_70%_30%,rgba(139,92,246,0.35),rgba(56,189,248,0.12),transparent_65%)] blur-2xl print:hidden"

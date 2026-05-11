@@ -26,7 +26,7 @@ body {
 }
 
 @page {
-  margin: 12mm;
+  margin: 0;
 }
 
 @media print {
@@ -34,6 +34,7 @@ body {
     background: #0b0f19 !important;
     height: auto !important;
     min-height: 0 !important;
+    margin: 0 !important;
   }
 
   body {
@@ -41,12 +42,18 @@ body {
     color: #e2e8f0 !important;
     height: auto !important;
     min-height: 0 !important;
+    margin: 0 !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  * {
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   }
 
   /* Match SpendScope dark surfaces when browsers honor backgrounds */
   main {
-    background: transparent !important;
+    background: #0b0f19 !important;
   }
 }
