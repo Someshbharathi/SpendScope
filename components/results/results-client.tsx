@@ -295,7 +295,6 @@ function AuditResultsReport({ payload }: { payload: AuditSessionPayload }) {
   const totalAnnual = report.totalAnnualSavings;
   const totalCurrentSpend = safeFindings.reduce((sum, f) => sum + f.currentSpend, 0);
   const totalOptimizedSpend = Math.max(0, safeFindings.reduce((sum, f) => sum + f.optimizedSpend, 0));
-  const highSavings = totalMonthly >= 500;
   const noModeledSavings = totalMonthly <= 0;
 
   const narrativeSource = aiExecutiveNarrative ?? executiveSummary;
@@ -473,17 +472,6 @@ function AuditResultsReport({ payload }: { payload: AuditSessionPayload }) {
             />
           </div>
         </GlassCard>
-
-        {highSavings ? (
-          <p className="mt-6 text-center text-sm print:hidden">
-            <Link
-              href="/audit"
-              className="font-medium text-cyan-300 underline-offset-2 transition hover:text-cyan-200 hover:underline"
-            >
-              Explore infrastructure credits (SpendScope)
-            </Link>
-          </p>
-        ) : null}
 
         <p className="mx-auto mt-10 max-w-lg text-center text-[11px] leading-relaxed text-white/38">
           Recommendations use published retail benchmarks and the seats and plans you entered—validate against invoices
