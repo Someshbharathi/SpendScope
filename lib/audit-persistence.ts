@@ -113,6 +113,15 @@ export function saveAuditFormToStorage(values: AuditFormValues): void {
   }
 }
 
+export function clearAuditFormStorage(): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.removeItem(AUDIT_FORM_STORAGE_KEY);
+  } catch {
+    /* private mode / storage unavailable */
+  }
+}
+
 export function saveAuditSessionPayload(payload: AuditSessionPayload): void {
   if (typeof window === "undefined") return;
   try {

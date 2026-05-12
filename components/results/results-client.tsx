@@ -14,7 +14,7 @@ import { buildAuditSummaryContext } from "@/lib/audit-summary-context";
 import { normalizeFinding } from "@/lib/audit-report-normalize";
 import { generateFallbackSummary } from "@/lib/fallback-summary";
 import { formatCurrency } from "@/lib/format-currency";
-import { loadAuditSessionPayload, saveAuditSessionPayload } from "@/lib/audit-persistence";
+import { clearAuditFormStorage, loadAuditSessionPayload, saveAuditSessionPayload } from "@/lib/audit-persistence";
 
 function ShareAuditReportButton({
   shareId,
@@ -378,7 +378,7 @@ function AuditResultsReport({ payload }: { payload: AuditSessionPayload }) {
         />
 
         <section
-          className="mb-10 rounded-xl border border-white/10 bg-white/[0.03] p-5 shadow-inner shadow-black/20 print:mb-6 print:break-inside-avoid sm:p-6"
+          className="mb-10 rounded-xl border border-white/10 bg-white/3 p-5 shadow-inner shadow-black/20 print:mb-6 print:break-inside-avoid sm:p-6"
           aria-labelledby="personalized-summary-heading"
         >
           <div className="flex flex-wrap items-center gap-2">
@@ -481,6 +481,7 @@ function AuditResultsReport({ payload }: { payload: AuditSessionPayload }) {
         <div className="mt-8 flex flex-col items-stretch gap-3 border-t border-white/10 pt-8 print:hidden sm:flex-row sm:items-center sm:justify-center">
           <Link
             href="/"
+            onClick={clearAuditFormStorage}
             className="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm text-white/80 transition hover:border-white/25 hover:bg-white/10"
           >
             Back to home
