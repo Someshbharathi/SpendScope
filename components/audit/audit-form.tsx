@@ -37,6 +37,27 @@ function formatUseCase(u: AuditFormValues["useCase"]): string {
   return useCaseLabel[u];
 }
 
+function parseNumericInput(value: unknown): number {
+  return Number(value || 0);
+}
+
+function normalizeAuditFormValues(values: AuditFormValues): AuditFormValues {
+  const tools = {} as AuditFormValues["tools"];
+  for (const id of TOOL_IDS) {
+    const tool = values.tools[id];
+    tools[id] = {
+      ...tool,
+      monthlySpend: parseNumericInput(tool.monthlySpend),
+      seats: parseNumericInput(tool.seats),
+    };
+  }
+
+  return {
+    ...values,
+    tools,
+  };
+}
+
 export function AuditForm() {
   const router = useRouter();
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -77,7 +98,8 @@ export function AuditForm() {
 
   async function onSubmit(values: AuditFormValues) {
     setSubmitError(null);
-    const parsed = auditFormSchema.safeParse(values);
+    const normalizedValues = normalizeAuditFormValues(values);
+    const parsed = auditFormSchema.safeParse(normalizedValues);
     if (!parsed.success) {
       const first = parsed.error.issues[0];
       setSubmitError(first?.message ?? "Please fix the form errors.");
@@ -397,12 +419,12 @@ function ToolCard({
                     type="number"
                     min={0}
                     step="1"
-                    placeholder="e.g. 480"
+                    placeholder="0"
                     className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white outline-none placeholder:text-white/30 focus:border-blue-400/40"
                     value={Number.isNaN(field.value) ? "" : field.value}
                     onChange={(e) => {
                       const v = e.target.value;
-                      field.onChange(v === "" ? 0 : Number(v));
+                      field.onChange(v === "" ? "" : Number(v));
                     }}
                   />
                 )}
@@ -425,12 +447,12 @@ function ToolCard({
                   <input
                     type="number"
                     min={1}
-                    placeholder="e.g. 8"
+                    placeholder="0"
                     className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white outline-none placeholder:text-white/30 focus:border-blue-400/40"
                     value={Number.isNaN(field.value) ? "" : field.value}
                     onChange={(e) => {
                       const v = e.target.value;
-                      field.onChange(v === "" ? 1 : Number(v));
+                      field.onChange(v === "" ? "" : Number(v));
                     }}
                   />
                 )}

@@ -11,8 +11,8 @@ export function getDefaultAuditFormValues(): AuditFormValues {
     tools[id] = {
       enabled: false,
       planId: getDefaultPlanId(id),
-      monthlySpend: 0,
-      seats: 1,
+      monthlySpend: "" as unknown as number,
+      seats: "" as unknown as number,
     };
   }
   return {

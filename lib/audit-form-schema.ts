@@ -11,14 +11,21 @@ const useCaseSchema = z.union([
   z.literal("data_analysis"),
 ]);
 
+function parseNumberInput(value: unknown): number {
+  return Number(value || 0);
+}
+
 const toolShape = z.object({
   enabled: z.boolean(),
   planId: z.string().min(1, "Select a plan"),
-  monthlySpend: z.number().min(0, "Spend cannot be negative"),
-  seats: z
-    .number()
-    .min(1, "At least 1 seat")
-    .max(50000, "Seat count too large"),
+  monthlySpend: z.preprocess(
+    parseNumberInput,
+    z.number().finite().min(0, "Spend cannot be negative"),
+  ),
+  seats: z.preprocess(
+    parseNumberInput,
+    z.number().finite().max(50000, "Seat count too large"),
+  ),
 });
 
 export const auditFormSchema = z
@@ -59,6 +66,13 @@ export const auditFormSchema = z
     for (const id of TOOL_IDS) {
       const row = data.tools[id];
       if (!row.enabled) continue;
+      if (row.seats < 1) {
+        ctx.addIssue({
+          code: "custom",
+          message: "At least 1 seat",
+          path: ["tools", id, "seats"],
+        });
+      }
       if (!getPlan(id, row.planId)) {
         ctx.addIssue({
           code: "custom",
