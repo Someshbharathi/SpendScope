@@ -29,7 +29,7 @@ export function HeroSection() {
           </div>
           <h1 className="mx-auto max-w-3xl text-5xl font-semibold leading-tight tracking-tight md:mx-0 md:text-7xl">
             Stop{" "}
-            <span className="bg-gradient-to-r from-blue-300 to-violet-300 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-blue-300 to-violet-300 bg-clip-text text-transparent">
               Overspending
             </span>{" "}
             on AI Tools
@@ -42,14 +42,19 @@ export function HeroSection() {
           <div className="flex flex-wrap items-center justify-center gap-4 md:justify-start">
             <Link
               href="/audit"
-              className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-[#0B0F19] shadow-[0_0_30px_rgba(255,255,255,0.35)] transition hover:translate-y-[-1px] hover:bg-white/95"
+              className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-[#0B0F19] shadow-[0_0_30px_rgba(255,255,255,0.35)] transition hover:-translate-y-px hover:bg-white/95"
             >
               Run Free Audit
               <ArrowRight className="h-4 w-4" />
             </Link>
-            <button className="rounded-full border border-white/10 bg-white/10 px-6 py-3 text-sm font-medium text-white backdrop-blur-xl transition hover:bg-white/15">
+            <Link
+              href="/example-report.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-full border border-white/10 bg-white/10 px-6 py-3 text-sm font-medium text-white backdrop-blur-xl transition hover:bg-white/15"
+            >
               See Example Report
-            </button>
+            </Link>
           </div>
         </motion.div>
 
@@ -59,7 +64,7 @@ export function HeroSection() {
           transition={{ duration: 0.75, ease: "easeOut", delay: 0.1 }}
           className="relative mx-auto w-full max-w-2xl md:mx-0 md:max-w-none"
         >
-          <div className="absolute inset-0 -z-10 translate-x-8 translate-y-9 rounded-3xl bg-gradient-to-br from-blue-500/25 via-violet-500/10 to-fuchsia-500/20 blur-3xl" />
+          <div className="absolute inset-0 -z-10 translate-x-8 translate-y-9 rounded-3xl bg-linear-to-br from-blue-500/25 via-violet-500/10 to-fuchsia-500/20 blur-3xl" />
           <div
             className="rounded-3xl border border-white/10 bg-white/5 p-8 shadow-[0_35px_90px_rgba(21,29,64,0.6)] backdrop-blur-2xl"
             style={{ transform: "perspective(1000px) rotateY(-12deg) rotateX(4deg)" }}
@@ -93,7 +98,7 @@ export function HeroSection() {
                   </div>
                 ))}
               </div>
-              <div className="mt-7 rounded-2xl border border-violet-300/20 bg-gradient-to-r from-violet-500/15 to-blue-500/10 p-4">
+              <div className="mt-7 rounded-2xl border border-violet-300/20 bg-linear-to-r from-violet-500/15 to-blue-500/10 p-4">
                 <p className="text-xs uppercase tracking-[0.16em] text-violet-100/70">
                   Potential savings found
                 </p>
