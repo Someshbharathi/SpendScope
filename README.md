@@ -173,6 +173,18 @@ Recommendations are benchmark-driven and designed to feel financially realistic 
 
 ---
 
+## Supabase Security Considerations
+
+For MVP simplicity, SpendScope currently uses unrestricted Supabase access for audit creation and retrieval through public share IDs.
+
+The application avoids exposing sensitive information in public reports by stripping identifying details from shared audit views.
+
+In a production deployment, the next step would be enabling stricter Row Level Security (RLS) policies, authenticated ownership checks, signed share tokens, and stronger rate limiting.
+
+This tradeoff was intentionally made to prioritize rapid iteration and frictionless report sharing during the MVP stage.
+
+---
+
 # Shareable Reports
 
 Each completed audit generates:

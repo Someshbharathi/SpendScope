@@ -187,3 +187,122 @@ Because of that, I could not start the project on the first day.
 - Verify full production flow end-to-end
 - Final deployment and submission polish
 - Finalize the project for submission
+
+---
+
+## Day 6 — 2026-05-11
+
+**Hours worked:** 5
+
+**What I did:**
+- Added GitHub Actions CI workflow for automated linting, TypeScript checks, and production builds
+- Completed major documentation files:
+  - ARCHITECTURE.md
+  - PROMPTS.md
+  - REFLECTION.md
+  - TESTS.md
+- Added Mermaid architecture flowchart documentation
+- Improved landing page layout and overall SaaS UI consistency
+- Added screenshots and deployment-related updates to README
+- Fixed download report page layout and improved PDF export experience
+- Added Vercel Analytics integration
+- Improved responsiveness and polished multiple UI sections across the application
+
+**What I learned:**
+- How CI workflows improve production confidence and code quality
+- How architecture documentation helps communicate engineering decisions
+- How deployment preparation requires additional cleanup and production checks
+- How polished UI consistency improves perceived SaaS quality
+
+**Blockers / what I'm stuck on:**
+- Minor deployment testing inconsistencies
+- Final production polish before public deployment
+
+**Plan for tomorrow:**
+- Improve results page interactions and audit UX
+- Add benchmark explanation modal
+- Improve public report sharing experience
+- Continue deployment testing and cleanup
+  
+---
+
+## Day 7 — 2026-05-12
+
+**Hours worked:** 5
+
+**What I did:**
+- Improved results page UI and corrected multiple layout inconsistencies
+- Fixed button interaction issues on the audit results page
+- Refined recommendation cards and savings display sections
+- Corrected multiple results-page behaviors and recommendation outputs
+- Improved audit form numeric input behavior for cleaner UX
+- Fixed leading zero issue in monthly spend and seat input fields
+- Added example public report support
+- Improved shareable report experience and public audit flow
+- Continued polishing SaaS dashboard styling and responsiveness
+- Performed additional deployment testing and production cleanup
+
+**What I learned:**
+- How small UX issues significantly affect SaaS product quality
+- How recommendation wording impacts perceived financial credibility
+- How public report sharing improves virality and product trust
+- How deployment testing exposes production-specific issues
+- How polished interactions improve overall product professionalism
+
+**Blockers / what I'm stuck on:**
+- Fine-tuning recommendation wording and benchmark explanations
+- Minor edge-case handling on the results page
+
+**Plan for tomorrow:**
+- Add benchmark explanation modal
+- Add entrepreneurial documentation files
+- Perform final project review against assignment requirements
+- Improve production readiness and cleanup
+- Finalize deployment and submission polish
+
+---
+
+## Day 8 — 2026-05-13
+
+**Hours worked:** 4
+
+**What I did:**
+- Added “See Benchmarking” modal popup with detailed benchmark explanations
+- Improved transparency around pricing comparisons and audit reasoning
+- Added all entrepreneurial documentation files:
+  - GTM.md
+  - ECONOMICS.md
+  - USER_INTERVIEWS.md
+  - LANDING_COPY.md
+  - METRICS.md
+- Performed multiple final project audits against assignment requirements
+- Improved documentation consistency and production-readiness explanations
+- Added lightweight API abuse protection for:
+  - AI summary generation
+  - email report APIs
+- Removed debug logs and performed final cleanup
+- Improved consistency between landing page messaging and actual MVP functionality
+- Added documentation explaining MVP-stage Supabase security tradeoffs
+- Updated CI workflow to include automated test execution
+- Fixed README deployment URL and environment variable documentation
+- Improved public share report privacy handling
+- Added final fixes and production cleanup before submission
+- Verified deployment environment configuration and GitHub Actions status
+
+**What I learned:**
+- How entrepreneurial thinking and engineering quality complement each other in SaaS products
+- How reviewer trust depends heavily on honest documentation and realistic claims
+- How benchmark transparency improves credibility in financial recommendation systems
+- How lightweight production safeguards improve MVP reliability
+- How final production polish significantly affects perceived product quality
+
+**Blockers / what I'm stuck on:**
+- No major blockers remaining
+- Remaining work is limited to final submission verification and minor polish
+
+**Plan for tomorrow:**
+- Perform one final production test pass
+- Verify all deployment links and documentation
+- Double-check CI/build/test status
+- Final repository cleanup
+- Submit the project
