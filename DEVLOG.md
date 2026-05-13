@@ -207,6 +207,8 @@ Because of that, I could not start the project on the first day.
 - Fixed download report page layout and improved PDF export experience
 - Added Vercel Analytics integration
 - Improved responsiveness and polished multiple UI sections across the application
+- I apologize for integrating the CI workflow later in the development timeline. My initial focus was on stabilizing the core MVP features, audit engine, and    deployment flow before automating validation checks. Once the primary functionality was completed and tested, I added the GitHub Actions workflow to handle linting, automated tests, TypeScript checks, and production build verification.
+
 
 **What I learned:**
 - How CI workflows improve production confidence and code quality
