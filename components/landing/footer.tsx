@@ -1,7 +1,7 @@
 import { Logo } from "./logo";
 
 const footerLinks = {
-  Product: ["Features", "Pricing", "Integrations"],
+  Product: ["Features", "Pricing", "Run audit"],
   Company: ["About", "Careers", "Contact"],
   Legal: ["Privacy", "Terms", "Security"],
 };
@@ -13,8 +13,8 @@ export function Footer() {
         <div>
           <Logo labelClassName="text-xl font-semibold" />
           <p className="mt-4 max-w-sm text-sm leading-7 text-white/65">
-            SpendScope helps teams uncover AI software waste, consolidate overlapping
-            tools, and recover budget with continuous spend intelligence.
+            SpendScope helps teams model AI software spend from what they already know,
+            compare it to list benchmarks, and walk into renewals with clearer questions.
           </p>
         </div>
         <div className="grid grid-cols-3 gap-8">

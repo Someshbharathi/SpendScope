@@ -73,7 +73,7 @@ npm run lint
 npm run build
 ```
 
-CI is configured to validate linting, TypeScript checks, and production builds automatically.  
+CI is configured to validate linting, tests, TypeScript checks, and production builds automatically.  
 Tests are designed specifically for deterministic audit-logic validation so recommendation and pricing behavior remain stable.
 
 ## CI/CD Validation
@@ -84,6 +84,7 @@ On push and pull requests to `main`, CI runs:
 
 - `npm install`
 - `npm run lint` (ESLint)
+- `npm run test` (Vitest — audit engine)
 - `npx tsc --noEmit` (TypeScript validation)
 - `npm run build` (production build check)
 

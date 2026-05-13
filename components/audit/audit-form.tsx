@@ -112,10 +112,6 @@ export function AuditForm() {
 
     try {
       const supabase = createClient();
-      console.log("FORM VALUES", parsed.data);
-      console.log("TOOLS", payload.tools_json.enabledTools);
-      console.log("AUDIT RESULTS", report);
-      console.log("FINAL PAYLOAD", payload);
 
       const insertResult = await insertAuditRow(supabase, payload);
       if (!insertResult.ok) {
@@ -123,10 +119,6 @@ export function AuditForm() {
         setSubmitError(insertResult.message || "Could not save audit. Try again.");
         return;
       }
-      console.log("SUPABASE INSERT SUCCESS", {
-        id: insertResult.id,
-        share_id: insertResult.shareId,
-      });
 
       saveAuditSessionPayload({
         version: 1,
@@ -171,8 +163,8 @@ export function AuditForm() {
           Map your AI stack
         </h1>
         <p className="max-w-2xl text-lg text-white/65">
-          Tell us who you are and what you pay. We&apos;ll benchmark tiers, spot sprawl, and
-          estimate savings—then store the run for your workspace.
+          Tell us who you are and what you pay. We benchmark what you enter against our list-price table, flag likely
+          sprawl, and estimate savings—then you can save and share the run.
         </p>
       </div>
 

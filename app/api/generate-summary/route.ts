@@ -3,10 +3,20 @@ import { NextResponse } from "next/server";
 import { auditSummaryContextSchema, type AuditSummaryContext } from "@/lib/audit-summary-context";
 import { generateFallbackSummary } from "@/lib/fallback-summary";
 import { generateExecutiveSummaryWithGemini } from "@/lib/gemini";
+import { getClientIp, rateLimit } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 
 export async function POST(req: Request) {
+  const ip = getClientIp(req);
+  const limited = rateLimit(`generate-summary:${ip}`, { max: 30, windowMs: 600_000 });
+  if (!limited.ok) {
+    return NextResponse.json(
+      { error: `Too many requests. Try again in ${limited.retryAfterSec} seconds.` },
+      { status: 429, headers: { "Retry-After": String(limited.retryAfterSec) } },
+    );
+  }
+
   let json: unknown;
   try {
     json = await req.json();

@@ -14,7 +14,7 @@ _(9 words)_
 
 ## Subheadline
 
-**Benchmark your ChatGPT, Cursor, Copilot, and Gemini spend against published list pricing, spot seat and plan issues, and export a report your team can debate.**
+**Benchmark your ChatGPT, Claude, Cursor, Copilot, and Gemini spend against published list pricing, spot seat and plan issues, and export a report your team can debate.**
 
 _(25 words)_
 

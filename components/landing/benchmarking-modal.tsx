@@ -2,29 +2,27 @@
 
 import { GlassModal } from "@/components/ui/glass-modal";
 
+/** Matches tools available in the audit form (`TOOL_IDS`). */
 const BENCHMARK_TOOLS = [
-  "Cursor",
   "ChatGPT",
   "Claude",
-  "OpenAI API",
-  "Anthropic API",
+  "Cursor",
   "GitHub Copilot",
   "Gemini",
-  "Windsurf",
 ] as const;
 
 const ANALYSIS_CARDS = [
   {
     title: "Plan Fit Analysis",
-    body: "We evaluate whether your subscription tier matches your team size and usage pattern.",
+    body: "We evaluate whether the subscription tiers you selected line up with the seat counts and spend figures you entered.",
   },
   {
     title: "Overspending Detection",
-    body: "We compare your spend against benchmark pricing ranges for similar teams and workflows.",
+    body: "We compare your reported spend against our list-price benchmark table for the same tools and plans.",
   },
   {
     title: "Alternative Tool Recommendations",
-    body: "We evaluate lower-cost tools with similar capabilities for your use case.",
+    body: "When overlap is likely, we suggest consolidating or downgrading based on rules—not live usage telemetry.",
   },
 ] as const;
 
@@ -61,7 +59,8 @@ export function BenchmarkingModal({ open, onClose }: BenchmarkingModalProps) {
             ))}
           </div>
           <p className="text-xs text-white/50">
-            Pricing references are updated regularly using official vendor pricing documentation.
+            Vendor list prices change; we refresh the benchmark table periodically from official pricing pages (see
+            PRICING_DATA.md)—not a live scraper.
           </p>
         </section>
 

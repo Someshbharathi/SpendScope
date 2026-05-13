@@ -6,9 +6,9 @@ import { SharedAuditReportClient } from "@/components/audit/shared-audit-report-
 import { fetchAuditByShareId, parseShareReport } from "@/lib/audit-share-fetch";
 import type { UseCase } from "@/lib/audit-types";
 import { formatCurrency } from "@/lib/format-currency";
+import { createClient } from "@/utils/supabase/server";
 
 const USE_CASES: UseCase[] = ["coding", "writing", "research", "mixed", "data_analysis"];
-import { createClient } from "@/utils/supabase/server";
 
 type PageProps = {
   params: Promise<{ share_id: string }>;
@@ -40,8 +40,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const summary = (report.executiveSummary ?? "").trim();
   const description =
     summary.length > 0
-      ? `${row.company_name} — ${summary.slice(0, 155)}${summary.length > 155 ? "…" : ""}`
-      : `Shared AI spend audit for ${row.company_name}.`;
+      ? `${summary.slice(0, 160)}${summary.length > 160 ? "…" : ""}`
+      : "Shared AI spend audit with benchmark-backed savings and recommendations.";
 
   return {
     title,
@@ -82,8 +82,6 @@ export default async function SharedAuditPage({ params }: PageProps) {
 
   return (
     <SharedAuditReportClient
-      companyName={row.company_name}
-      role={row.role}
       teamSize={Math.max(1, row.team_size)}
       useCase={useCase}
       report={report}

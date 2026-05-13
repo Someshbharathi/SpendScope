@@ -683,15 +683,6 @@ function analyzeTool(form: AuditFormValues, toolId: ToolId): ToolAuditFinding | 
   finding.optimizationSummary = optimizationSummary(finding);
   finding.oneSentenceReason = oneSentenceReason(finding);
 
-  if (process.env.NODE_ENV === "development") {
-    console.log({
-      benchmark: benchmarkSpendMonthly,
-      actualSpend: currentSpend,
-      ratio: spendRatio,
-      classification: spendClassification,
-    });
-  }
-
   return finding;
 }
 

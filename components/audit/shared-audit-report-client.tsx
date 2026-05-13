@@ -4,8 +4,6 @@ import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
 import {
   ArrowRight,
-  Briefcase,
-  Building2,
   Download,
   FileText,
   Sparkles,
@@ -30,8 +28,6 @@ const USE_CASE_LABEL: Record<UseCase, string> = {
 };
 
 export type SharedAuditReportProps = {
-  companyName: string;
-  role: string;
   teamSize: number;
   useCase: UseCase | null;
   report: AuditReport;
@@ -61,8 +57,6 @@ function MetaTile({
 }
 
 export function SharedAuditReportClient({
-  companyName,
-  role,
   teamSize,
   useCase,
   report,
@@ -125,7 +119,7 @@ export function SharedAuditReportClient({
                   <div className="w-full sm:w-auto sm:pt-1 sm:text-right">
                     <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/35">Snapshot</p>
                     <p className="mt-1 max-w-56 text-xs leading-relaxed text-white/50 sm:ml-auto">
-                      Read-only view · Benchmarks vs retail list pricing
+                      Public link — organization and role are not shown. Benchmarks vs what was entered at audit time.
                     </p>
                   </div>
                   <button
@@ -143,10 +137,8 @@ export function SharedAuditReportClient({
                 </div>
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                <MetaTile icon={Building2} label="Organization" value={companyName || "—"} />
-                <MetaTile icon={Users} label="Team size" value={`${teamSize} people`} />
-                <MetaTile icon={Briefcase} label="Stakeholder role" value={role || "—"} />
+              <div className="grid gap-3 sm:grid-cols-2">
+                <MetaTile icon={Users} label="Team size (declared)" value={`${teamSize} people`} />
                 <MetaTile icon={Target} label="Primary use case" value={useCaseLabel ?? "—"} />
               </div>
             </header>

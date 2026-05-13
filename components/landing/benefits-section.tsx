@@ -7,7 +7,7 @@ const benefits = [
   {
     title: "AI Spend Visibility",
     description:
-      "Get a unified view of every AI subscription, license owner, and usage trend across your stack.",
+      "See modeled spend for the tools, plans, and seats you enter—compared to published list benchmarks, not live billing feeds.",
     Icon: Eye,
     color: "text-blue-300",
     glow: "from-blue-500/50",
@@ -15,7 +15,7 @@ const benefits = [
   {
     title: "Cost Optimization",
     description:
-      "Surface underutilized seats and right-size plans before invoices quietly compound month over month.",
+      "Spot when reported run-rate drifts above list expectations so you can ask better questions before renewal—directional, not a quote.",
     Icon: TrendingDown,
     color: "text-violet-300",
     glow: "from-violet-500/50",
@@ -23,7 +23,7 @@ const benefits = [
   {
     title: "Tool Consolidation",
     description:
-      "Identify overlapping AI apps and consolidate teams onto fewer, higher-value tools without disruption.",
+      "When multiple assistants are enabled with overlapping seats, the audit highlights overlap patterns worth reconciling with your team.",
     Icon: Layers,
     color: "text-fuchsia-300",
     glow: "from-fuchsia-500/50",
@@ -31,7 +31,7 @@ const benefits = [
   {
     title: "Annual Savings Insights",
     description:
-      "Model yearly savings opportunities with practical recommendations your finance team can execute quickly.",
+      "Monthly and annual savings are modeled from benchmarks and your inputs—useful for internal prep, then validate against invoices.",
     Icon: LineChart,
     color: "text-emerald-300",
     glow: "from-emerald-500/50",
@@ -40,43 +40,44 @@ const benefits = [
 
 export function BenefitsSection() {
   return (
-    <section
-      id="benefits"
-      className="px-6 py-24 md:px-10 lg:px-16"
-    >
+    <section id="benefits" className="px-6 py-24 md:px-10 lg:px-16">
       <div className="mx-auto w-full max-w-7xl">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.55, ease: "easeOut" }}
-          className="mx-auto mb-14 max-w-3xl text-center"
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="mb-16 text-center md:text-left"
         >
-          <h2 className="text-3xl font-semibold tracking-tight md:text-5xl">
-            Everything you need to tame AI sprawl
-          </h2>
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-blue-200/70">Why teams use SpendScope</p>
+          <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-5xl">Clarity before the renewal email</h2>
+          <p className="mx-auto mt-4 max-w-2xl text-lg text-white/65 md:mx-0">
+            A fast audit from what you already know—no connector required—so finance and eng can share one picture.
+          </p>
         </motion.div>
+
         <div className="grid gap-6 md:grid-cols-2">
-          {benefits.map(({ title, description, Icon, color, glow }, index) => (
-            <motion.article
-              key={title}
+          {benefits.map((benefit, index) => (
+            <motion.div
+              key={benefit.title}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.45, delay: index * 0.07, ease: "easeOut" }}
-              className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-7 backdrop-blur-xl"
+              viewport={{ once: true, amount: 0.35 }}
+              transition={{ duration: 0.45, delay: index * 0.05, ease: "easeOut" }}
+              className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl"
             >
               <div
-                className={`pointer-events-none absolute right-0 top-0 h-28 w-28 bg-gradient-to-bl ${glow} to-transparent opacity-0 blur-2xl transition-opacity duration-300 group-hover:opacity-100`}
+                className={`pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-linear-to-br ${benefit.glow} to-transparent blur-3xl`}
+                aria-hidden
               />
-              <div
-                className={`mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl border border-white/10 bg-white/5 ${color}`}
-              >
-                <Icon className="h-5 w-5" />
+              <div className="relative space-y-4">
+                <div className={`inline-flex rounded-xl border border-white/10 bg-white/5 p-3 ${benefit.color}`}>
+                  <benefit.Icon className="h-6 w-6" aria-hidden />
+                </div>
+                <h3 className="text-xl font-semibold text-white">{benefit.title}</h3>
+                <p className="text-sm leading-relaxed text-white/65">{benefit.description}</p>
               </div>
-              <h3 className="mb-3 text-xl font-semibold">{title}</h3>
-              <p className="text-sm leading-7 text-white/65">{description}</p>
-            </motion.article>
+            </motion.div>
           ))}
         </div>
       </div>

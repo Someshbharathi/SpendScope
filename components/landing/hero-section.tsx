@@ -5,9 +5,9 @@ import { ArrowRight, Zap } from "lucide-react";
 import { motion } from "motion/react";
 
 const expenses = [
-  { label: "OpenAI", value: 84, color: "bg-blue-400" },
-  { label: "Anthropic", value: 66, color: "bg-violet-400" },
-  { label: "Midjourney", value: 42, color: "bg-fuchsia-400" },
+  { label: "ChatGPT", value: 84, color: "bg-blue-400" },
+  { label: "Claude", value: 66, color: "bg-violet-400" },
+  { label: "Cursor", value: 42, color: "bg-fuchsia-400" },
 ];
 
 export function HeroSection() {
@@ -25,7 +25,7 @@ export function HeroSection() {
         >
           <div className="inline-flex items-center gap-2 rounded-full border border-blue-300/25 bg-blue-400/10 px-4 py-2 text-xs text-blue-100">
             <Zap className="h-3.5 w-3.5" />
-            New: Auto-detect redundant AI tools
+            Benchmark-backed audit in minutes
           </div>
           <h1 className="mx-auto max-w-3xl text-5xl font-semibold leading-tight tracking-tight md:mx-0 md:text-7xl">
             Stop{" "}
@@ -35,9 +35,9 @@ export function HeroSection() {
             on AI Tools
           </h1>
           <p className="mx-auto max-w-2xl text-lg leading-8 text-white/70 md:mx-0 md:text-xl">
-            SpendScope Spend Audit automatically scans your stack to find hidden AI
-            subscriptions, duplicate tools, and unused licenses. Optimize your
-            team&apos;s SaaS spending in seconds.
+            Enter the AI tools, plans, and seats you pay for. SpendScope compares your
+            inputs to published list benchmarks, highlights overlap risk, and estimates
+            savings—no billing connector or workspace access required.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4 md:justify-start">
             <Link

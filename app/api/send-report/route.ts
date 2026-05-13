@@ -4,6 +4,7 @@ import { z } from "zod";
 import { isValidShareIdFormat } from "@/lib/audit-share-fetch";
 import { getPublicOriginFromRequest } from "@/lib/email/site-url";
 import { isResendConfigured, sendAuditReportEmail } from "@/lib/email/send-audit-report-email";
+import { getClientIp, rateLimit } from "@/lib/rate-limit";
 
 const bodySchema = z.object({
   email: z.string().trim().email().max(320),
@@ -17,6 +18,15 @@ const bodySchema = z.object({
 
 export async function POST(req: Request) {
   try {
+    const ip = getClientIp(req);
+    const limited = rateLimit(`send-report:${ip}`, { max: 15, windowMs: 600_000 });
+    if (!limited.ok) {
+      return NextResponse.json(
+        { error: `Too many requests. Try again in ${limited.retryAfterSec} seconds.` },
+        { status: 429, headers: { "Retry-After": String(limited.retryAfterSec) } },
+      );
+    }
+
     if (!isResendConfigured()) {
       return NextResponse.json(
         { error: "Email delivery is not configured. Please try again later." },

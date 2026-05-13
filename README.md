@@ -1,6 +1,6 @@
 # SpendScope
 
-SpendScope is an AI spend optimization platform that helps startups and small teams analyze their AI tooling costs, identify overspending, and discover realistic savings opportunities. Users can audit tools like ChatGPT, Claude, Cursor, GitHub Copilot, and Gemini based on pricing benchmarks, seat counts, and usage patterns.
+SpendScope is an AI spend optimization platform that helps startups and small teams analyze their AI tooling costs, identify overspending, and discover realistic savings opportunities. Users can audit tools like ChatGPT, Claude, Cursor, GitHub Copilot, and Gemini based on pricing benchmarks, seat counts, and the spend figures they provide—no live billing connection in this MVP.
 
 The platform generates actionable recommendations, estimated monthly and annual savings, downloadable reports, public shareable audit links, and email-delivered audit summaries. The goal is to make AI cost optimization simple, transparent, and financially defensible for growing teams.
 
@@ -9,7 +9,7 @@ The platform generates actionable recommendations, estimated monthly and annual 
 # Live Demo
 
 Deployed URL:  
-https://your-vercel-url.vercel.app
+https://spend-scope-murex.vercel.app/
 
 ---
 
@@ -121,10 +121,13 @@ Create a `.env.local` file:
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 
 RESEND_API_KEY=
 RESEND_FROM_EMAIL=onboarding@resend.dev
+
+# AI executive summary (optional — if unset, the API falls back to a deterministic paragraph)
+GEMINI_API_KEY=
 
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
@@ -160,7 +163,7 @@ Production environment variables should be configured inside the Vercel dashboar
 
 The audit engine evaluates:
 
-- Whether the current plan matches the user's seat count and usage
+- Whether the current plan matches the user's seat count and declared spend
 - If a cheaper plan exists from the same vendor
 - If a better-value alternative tool exists
 - If pricing significantly exceeds expected retail benchmarks

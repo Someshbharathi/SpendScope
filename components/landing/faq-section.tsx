@@ -8,22 +8,22 @@ const faqItems = [
   {
     question: "How does the audit process work?",
     answer:
-      "SpendScope connects to your workspace and finance tools in read-only mode, maps AI subscriptions to team usage, and highlights duplicate or underused licenses with recommended actions.",
+      "You enter the AI tools you pay for, plans, seats, and rough monthly spend. SpendScope compares that to published list benchmarks in our pricing table and returns recommendations and savings modeled from those inputs—no workspace or billing connection required.",
   },
   {
     question: "Is my financial data secure?",
     answer:
-      "Yes. Data connections are encrypted in transit and at rest, and SpendScope only requests scoped read permissions needed to generate your spend analysis.",
+      "Data you submit goes over HTTPS. Saved audits live in our database so share links work; treat anything you wouldn’t put in a shared doc as sensitive. We don’t ask for bank or card access in this MVP.",
   },
   {
-    question: "Which tools do you detect?",
+    question: "Which tools can I audit?",
     answer:
-      "We detect major AI products and seats across engineering, design, and operations stacks, including direct vendor contracts and marketplace-managed subscriptions.",
+      "The form supports ChatGPT, Claude, Cursor, GitHub Copilot, and Gemini—each with plan choices aligned to our benchmark table. We don’t auto-detect subscriptions from your accounts; you toggle what applies.",
   },
   {
     question: "How long does it take to see results?",
     answer:
-      "Most teams get a full baseline report in under 60 seconds, with deeper optimization insights arriving as additional spend and license metadata syncs.",
+      "Usually under a minute: submit the form, we run the deterministic engine, then optional AI summary and email. There is no background “sync”—rerun when your stack changes.",
   },
 ];
 
