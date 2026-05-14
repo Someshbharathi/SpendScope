@@ -3,8 +3,8 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { AuditReport, UseCase } from "./audit-types";
 
 /**
- * Public share pages use the anon Supabase client. Ensure RLS (or a secure API route) allows
- * `SELECT` on `audits` for rows matched by `share_id` only—never expose unrelated rows.
+ * Public share pages load audits via RPC `get_audit_by_share_id` (SECURITY DEFINER).
+ * Direct `SELECT` on `audits` stays denied for anon under RLS so the table cannot be enumerated.
  */
 
 /** Row shape returned from `audits` for share links */
@@ -35,15 +35,16 @@ export async function fetchAuditByShareId(
   const trimmed = shareId.trim();
   if (!trimmed || !isValidShareIdFormat(trimmed)) return null;
 
-  const { data, error } = await supabase
-    .from("audits")
-    .select("id, share_id, company_name, role, team_size, tools_json, results_json, created_at")
-    .eq("share_id", trimmed)
-    .maybeSingle();
+  const { data, error } = await supabase.rpc("get_audit_by_share_id", {
+    p_share_id: trimmed,
+  });
 
-  if (error || !data) return null;
+  if (error || data == null) return null;
 
-  const row = data as Record<string, unknown>;
+  const rowRaw = Array.isArray(data) ? data[0] : data;
+  if (!rowRaw || typeof rowRaw !== "object") return null;
+
+  const row = rowRaw as Record<string, unknown>;
   if (typeof row.share_id !== "string" || typeof row.company_name !== "string") return null;
 
   return {

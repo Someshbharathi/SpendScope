@@ -58,11 +58,9 @@ export async function insertAuditRow(
   supabase: SupabaseClient,
   payload: AuditInsertPayload,
 ): Promise<InsertAuditResult> {
-  const { data, error } = await supabase
-    .from("audits")
-    .insert([payload])
-    .select("id, share_id")
-    .maybeSingle();
+  // Avoid .select() after insert: with RLS enabled and no SELECT policy for anon,
+  // Postgres would filter RETURNING rows and PostgREST can surface insert failures.
+  const { error } = await supabase.from("audits").insert([payload]);
 
   if (error) {
     return { ok: false, message: error.message };
@@ -70,8 +68,8 @@ export async function insertAuditRow(
 
   return {
     ok: true,
-    id: (data as { id?: string } | null)?.id ?? null,
-    shareId: (data as { share_id?: string } | null)?.share_id ?? payload.share_id,
+    id: null,
+    shareId: payload.share_id,
   };
 }
 
