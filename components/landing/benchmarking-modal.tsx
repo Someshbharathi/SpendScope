@@ -59,8 +59,7 @@ export function BenchmarkingModal({ open, onClose }: BenchmarkingModalProps) {
             ))}
           </div>
           <p className="text-xs text-white/50">
-            Vendor list prices change; we refresh the benchmark table periodically from official pricing pages (see
-            PRICING_DATA.md)—not a live scraper.
+            Vendor list prices change; we refresh the benchmark table periodically from official pricing pages — not a live scraper.
           </p>
         </section>
 

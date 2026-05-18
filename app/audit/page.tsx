@@ -5,7 +5,7 @@ import { AuditForm } from "@/components/audit/audit-form";
 import { AuditTopNav } from "@/components/audit/audit-top-nav";
 
 export const metadata: Metadata = {
-  title: "Run audit — SpendScope Spend Audit",
+  title: "Run Audit | SpendScope",
   description: "Submit your AI tool spend and receive savings recommendations.",
 };
 

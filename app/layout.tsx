@@ -14,8 +14,21 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SpendScope Spend Audit",
-  description: "Stop overspending on AI tools with automated spend audits.",
+  title: "SpendScope | AI Spend Optimization Platform",
+  description:
+    "Stop overspending on AI tools with automated spend audits. Analyze ChatGPT, Claude, and Gemini costs and discover realistic savings opportunities.",
+  openGraph: {
+    title: "SpendScope | AI Spend Optimization Platform",
+    description: "Stop overspending on AI tools with automated spend audits.",
+    url: "https://spend-scope-murex.vercel.app/",
+    siteName: "SpendScope",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "SpendScope | AI Spend Optimization Platform",
+    description: "Stop overspending on AI tools with automated spend audits.",
+  },
 };
 
 export default function RootLayout({
@@ -28,7 +41,7 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="font-sans min-h-full flex flex-col">
         {children}
         <Analytics />
       </body>
