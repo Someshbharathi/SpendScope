@@ -32,6 +32,11 @@ export type SharedAuditReportProps = {
   useCase: UseCase | null;
   report: AuditReport;
   generatedAtLabel: string;
+  /** e.g. pricing-change re-audit context */
+  bannerMessage?: string | null;
+  headerBadge?: string;
+  /** Link to the originally saved share snapshot */
+  savedShareUrl?: string | null;
 };
 
 function MetaTile({
@@ -61,6 +66,9 @@ export function SharedAuditReportClient({
   useCase,
   report,
   generatedAtLabel,
+  bannerMessage = null,
+  headerBadge = "Shared report",
+  savedShareUrl = null,
 }: SharedAuditReportProps) {
   const safeFindings = (report.findings ?? []).map(normalizeFinding);
   const executiveSummary =
@@ -104,11 +112,11 @@ export function SharedAuditReportClient({
                 <div className="space-y-3">
                   <div className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/5 px-3 py-1.5 text-violet-200/85">
                     <FileText className="h-3.5 w-3.5 shrink-0 opacity-90" aria-hidden />
-                    <span className="text-[11px] font-semibold uppercase tracking-[0.22em]">Shared report</span>
+                    <span className="text-[11px] font-semibold uppercase tracking-[0.22em]">{headerBadge}</span>
                   </div>
                   <div>
                     <h1 className="text-balance text-3xl font-semibold leading-[1.12] tracking-tight text-white sm:text-4xl md:text-[2.35rem]">
-                      AI Spend Audit Report
+                      {report.companyName?.trim() ? `${report.companyName} — AI Spend Audit` : "AI Spend Audit Report"}
                     </h1>
                     <p className="mt-2 text-sm text-white/45">
                       Generated <span className="text-white/65">{generatedAtLabel}</span>
@@ -142,6 +150,24 @@ export function SharedAuditReportClient({
                 <MetaTile icon={Target} label="Primary use case" value={useCaseLabel ?? "—"} />
               </div>
             </header>
+
+            {bannerMessage ? (
+              <div
+                role="status"
+                className="rounded-xl border border-amber-400/25 bg-amber-500/10 px-4 py-3 text-sm leading-relaxed text-amber-100/90"
+              >
+                {bannerMessage}
+              </div>
+            ) : null}
+
+            {savedShareUrl ? (
+              <p className="text-sm text-white/55">
+                <Link href={savedShareUrl} className="font-medium text-blue-300 hover:text-blue-200">
+                  View your previously saved report snapshot
+                </Link>
+                {" "}(before today&apos;s benchmark update).
+              </p>
+            ) : null}
 
             <div className="h-px w-full bg-linear-to-r from-transparent via-white/15 to-transparent" aria-hidden />
 

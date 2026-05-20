@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 
+import { sendPricingChangeNotifications } from "@/lib/detect-changes-notify";
+import { getPublicAppOrigin, getPublicOriginFromRequest } from "@/lib/email/site-url";
+import { isValidShareIdFormat } from "@/lib/audit-share-fetch";
 import { parseAuditRowToFormValues } from "@/lib/audit-row-to-form-values";
 import {
   buildReauditDiff,
@@ -21,6 +24,7 @@ const PAGE_SIZE = 500;
 
 type AuditRow = {
   id: string;
+  share_id: unknown;
   pricing_snapshot: unknown;
   tools_json: unknown;
   results_json: unknown;
@@ -30,10 +34,20 @@ type AuditRow = {
   team_size: unknown;
 };
 
+type AffectedAuditRow = DetectChangesWithReauditItem & {
+  email: string;
+  company_name: string;
+  share_id: string;
+};
+
 function extractToolsFromSnapshot(raw: unknown): unknown {
   if (!raw || typeof raw !== "object") return null;
   const tools = (raw as { tools?: unknown }).tools;
   return tools ?? null;
+}
+
+function companyLabel(raw: unknown): string {
+  return typeof raw === "string" && raw.trim().length > 0 ? raw.trim() : "Your audit";
 }
 
 export async function GET(req: Request) {
@@ -58,13 +72,13 @@ export async function GET(req: Request) {
   }
 
   try {
-    const out: DetectChangesWithReauditItem[] = [];
+    const out: AffectedAuditRow[] = [];
     let offset = 0;
 
     for (;;) {
       const { data, error } = await admin
         .from("audits")
-        .select("id, pricing_snapshot, tools_json, results_json, email, company_name, role, team_size")
+        .select("id, share_id, pricing_snapshot, tools_json, results_json, email, company_name, role, team_size")
         .order("id", { ascending: true })
         .range(offset, offset + PAGE_SIZE - 1);
 
@@ -92,12 +106,19 @@ export async function GET(req: Request) {
         const newSummary = summarizeAuditReport(newReport);
         if (!newSummary) continue;
 
+        const email = typeof row.email === "string" ? row.email.trim() : "";
+        const shareId = typeof row.share_id === "string" ? row.share_id.trim() : "";
+        if (!shareId || !isValidShareIdFormat(shareId)) continue;
+
         out.push({
           audit_id: String(row.id),
           changes,
           old_result: summarizeAuditReport(oldReport),
           new_result: newSummary,
           diff,
+          email,
+          company_name: companyLabel(row.company_name),
+          share_id: shareId,
         });
       }
 
@@ -106,7 +127,22 @@ export async function GET(req: Request) {
     }
 
     out.sort((a, b) => a.audit_id.localeCompare(b.audit_id));
-    return NextResponse.json(out);
+
+    const notifications = await sendPricingChangeNotifications(out, req);
+
+    const origin = process.env.NEXT_PUBLIC_APP_URL?.trim()
+      ? getPublicAppOrigin()
+      : getPublicOriginFromRequest(req);
+
+    const audits = out.map(({ email: _email, company_name, audit_id, share_id, ...rest }) => ({
+      ...rest,
+      audit_id,
+      company_name,
+      share_id,
+      reaudit_url: `${origin.replace(/\/$/, "")}/re-audit/${encodeURIComponent(share_id)}`,
+    }));
+
+    return NextResponse.json({ audits, notifications });
   } catch (err) {
     console.error("[detect-changes]", err);
     return NextResponse.json({ error: "Unexpected error while scanning audits." }, { status: 500 });

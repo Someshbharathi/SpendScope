@@ -7,18 +7,20 @@ import type { AuditReport, UseCase } from "./audit-types";
  * Direct `SELECT` on `audits` stays denied for anon under RLS so the table cannot be enumerated.
  */
 
-/** Row shape returned from `audits` for share links */
+/** Row shape returned from `audits` for share / re-audit links */
 export type AuditShareRow = {
   id: string;
   share_id: string;
   company_name: string;
   role: string;
   team_size: number;
+  email: string;
   tools_json: {
     useCase?: UseCase;
     enabledTools?: unknown[];
   } | null;
   results_json: AuditReport | null;
+  pricing_snapshot: unknown;
   created_at?: string | null;
 };
 
@@ -53,8 +55,10 @@ export async function fetchAuditByShareId(
     company_name: row.company_name,
     role: typeof row.role === "string" ? row.role : "",
     team_size: typeof row.team_size === "number" && Number.isFinite(row.team_size) ? row.team_size : 0,
+    email: typeof row.email === "string" ? row.email.trim() : "",
     tools_json: (row.tools_json as AuditShareRow["tools_json"]) ?? null,
     results_json: (row.results_json as AuditReport | null) ?? null,
+    pricing_snapshot: row.pricing_snapshot ?? null,
     created_at: row.created_at != null ? String(row.created_at) : null,
   };
 }
