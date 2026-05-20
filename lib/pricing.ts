@@ -75,7 +75,7 @@ export const TOOL_PRICING: Record<ToolId, ToolPricing> = {
       {
         id: "pro",
         label: "Pro",
-        monthlyPerSeat: 10,
+        monthlyPerSeat: 20,
         tier: "individual",
       },
       {
@@ -175,6 +175,23 @@ export function isTeamishTier(tier: ToolPlan["tier"]): boolean {
 
 export function isEnterpriseTier(tier: ToolPlan["tier"]): boolean {
   return tier === "enterprise";
+}
+
+/** Live benchmark catalog tool ids (keys of `TOOL_PRICING`). */
+export function getConfiguredToolIds(): ToolId[] {
+  return Object.keys(TOOL_PRICING) as ToolId[];
+}
+
+export function isConfiguredToolId(value: string): value is ToolId {
+  return Object.prototype.hasOwnProperty.call(TOOL_PRICING, value);
+}
+
+export function getToolDisplayName(toolId: string): string {
+  return isConfiguredToolId(toolId) ? TOOL_PRICING[toolId].displayName : toolId;
+}
+
+export function getPlanDisplayLabel(toolId: string, planId: string): string {
+  return isConfiguredToolId(toolId) ? (getPlan(toolId, planId)?.label ?? planId) : planId;
 }
 
 /** Deep copy of current list-price benchmarks + metadata for Supabase `pricing_snapshot`. */

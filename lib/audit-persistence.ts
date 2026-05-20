@@ -1,13 +1,12 @@
 import type { AuditFormValues, AuditReport, AuditSessionPayload } from "./audit-types";
-import { TOOL_IDS } from "./audit-types";
-import { getDefaultPlanId, getPlan } from "./pricing";
+import { getConfiguredToolIds, getDefaultPlanId, getPlan } from "./pricing";
 
 export const AUDIT_FORM_STORAGE_KEY = "spendscope:audit-form:v1";
 export const AUDIT_SESSION_STORAGE_KEY = "spendscope:audit-result:v1";
 
 export function getDefaultAuditFormValues(): AuditFormValues {
   const tools = {} as AuditFormValues["tools"];
-  for (const id of TOOL_IDS) {
+  for (const id of getConfiguredToolIds()) {
     tools[id] = {
       enabled: false,
       planId: getDefaultPlanId(id),
@@ -34,7 +33,7 @@ function mergeTools(raw: unknown): AuditFormValues["tools"] {
   if (!isRecord(raw)) return defaults;
 
   const out = { ...defaults };
-  for (const id of TOOL_IDS) {
+  for (const id of getConfiguredToolIds()) {
     const t = raw[id];
     if (!isRecord(t)) continue;
     const enabled = typeof t.enabled === "boolean" ? t.enabled : defaults[id].enabled;

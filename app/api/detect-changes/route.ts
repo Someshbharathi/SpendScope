@@ -8,8 +8,10 @@ import {
   type DetectChangesWithReauditItem,
 } from "@/lib/audit-rerun-diff";
 import { runAuditEngine } from "@/lib/audit-engine";
-import type { ToolId } from "@/lib/audit-types";
-import { diffSnapshotToolsAgainstCurrent } from "@/lib/pricing-snapshot-diff";
+import {
+  diffSnapshotToolsAgainstCurrent,
+  enrichPlanPriceChanges,
+} from "@/lib/pricing-snapshot-diff";
 import { getClientIp, rateLimit } from "@/lib/rate-limit";
 import { createServiceRoleClient } from "@/utils/supabase/admin";
 
@@ -32,10 +34,6 @@ function extractToolsFromSnapshot(raw: unknown): unknown {
   if (!raw || typeof raw !== "object") return null;
   const tools = (raw as { tools?: unknown }).tools;
   return tools ?? null;
-}
-
-function pricingAffectedTools(changes: { tool: ToolId }[]): ToolId[] {
-  return [...new Set(changes.map((c) => c.tool))].sort();
 }
 
 export async function GET(req: Request) {
@@ -80,17 +78,16 @@ export async function GET(req: Request) {
 
       for (const row of rows) {
         const snapshotTools = extractToolsFromSnapshot(row.pricing_snapshot);
-        const changes = diffSnapshotToolsAgainstCurrent(snapshotTools);
-        if (changes.length === 0) continue;
+        const rawChanges = diffSnapshotToolsAgainstCurrent(snapshotTools);
+        if (rawChanges.length === 0) continue;
 
         const form = parseAuditRowToFormValues(row);
         if (!form) continue;
 
         const oldReport = parseStoredAuditReport(row.results_json);
         const newReport = runAuditEngine(form);
-
-        const affected = pricingAffectedTools(changes);
-        const diff = buildReauditDiff(affected, oldReport, newReport);
+        const changes = enrichPlanPriceChanges(rawChanges);
+        const diff = buildReauditDiff(rawChanges, oldReport, newReport);
 
         const newSummary = summarizeAuditReport(newReport);
         if (!newSummary) continue;

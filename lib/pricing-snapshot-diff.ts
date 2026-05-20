@@ -1,12 +1,24 @@
-import { TOOL_IDS, type ToolId, type ToolPlan } from "./audit-types";
-import { TOOL_PRICING } from "./pricing";
+import type { ToolId, ToolPlan } from "./audit-types";
+import {
+  getConfiguredToolIds,
+  getPlanDisplayLabel,
+  getToolDisplayName,
+  isConfiguredToolId,
+  TOOL_PRICING,
+} from "./pricing";
 
 /** One plan whose list `monthlyPerSeat` changed between snapshot and current benchmark. */
 export type PlanPriceChange = {
-  tool: ToolId;
+  tool: string;
   plan: string;
   old_price: number | null;
   new_price: number | null;
+};
+
+/** Same as `PlanPriceChange` with labels resolved from the live benchmark catalog. */
+export type EnrichedPlanPriceChange = PlanPriceChange & {
+  tool_display_name: string;
+  plan_label: string;
 };
 
 function normalizeMonthlyPerSeat(value: unknown): number | null {
@@ -44,17 +56,27 @@ function indexPlansById(plans: unknown): Map<string, ToolPlan> {
   return map;
 }
 
+/** Union of catalog tool ids and keys present on a stored snapshot (catalog-only diff). */
+export function getToolIdsForPricingDiff(snapshotTools: unknown): ToolId[] {
+  const ids = new Set<ToolId>(getConfiguredToolIds());
+  if (snapshotTools && typeof snapshotTools === "object") {
+    for (const key of Object.keys(snapshotTools as object)) {
+      if (isConfiguredToolId(key)) ids.add(key);
+    }
+  }
+  return [...ids].sort();
+}
+
 /**
- * Compare a stored `pricing_snapshot.tools` object to live `TOOL_PRICING`.
- * Only considers plan IDs that exist on **both** sides (ignores new/removed plans).
- * Detects differences in `monthlyPerSeat` only.
+ * Compare stored `pricing_snapshot.tools` to live `TOOL_PRICING`.
+ * Iterates the benchmark catalog dynamically; only plan ids on both sides; `monthlyPerSeat` only.
  */
 export function diffSnapshotToolsAgainstCurrent(snapshotTools: unknown): PlanPriceChange[] {
   if (!snapshotTools || typeof snapshotTools !== "object") return [];
 
   const changes: PlanPriceChange[] = [];
 
-  for (const toolId of TOOL_IDS) {
+  for (const toolId of getToolIdsForPricingDiff(snapshotTools)) {
     const currentTool = TOOL_PRICING[toolId];
     const snapEntry = (snapshotTools as Record<string, unknown>)[toolId];
     if (!snapEntry || typeof snapEntry !== "object") continue;
@@ -80,4 +102,22 @@ export function diffSnapshotToolsAgainstCurrent(snapshotTools: unknown): PlanPri
   }
 
   return changes;
+}
+
+export function enrichPlanPriceChanges(changes: PlanPriceChange[]): EnrichedPlanPriceChange[] {
+  return changes.map((c) => ({
+    ...c,
+    tool_display_name: getToolDisplayName(c.tool),
+    plan_label: getPlanDisplayLabel(c.tool, c.plan),
+  }));
+}
+
+/** Unique tool ids from detected price changes (sorted). */
+export function getAffectedToolIdsFromChanges(changes: PlanPriceChange[]): string[] {
+  return [...new Set(changes.map((c) => c.tool))].sort();
+}
+
+/** Display names for affected tools, derived from the benchmark catalog. */
+export function getAffectedToolLabelsFromChanges(changes: PlanPriceChange[]): string[] {
+  return getAffectedToolIdsFromChanges(changes).map((id) => getToolDisplayName(id));
 }

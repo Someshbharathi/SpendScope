@@ -10,10 +10,10 @@ import type {
   ToolPlan,
   UseCase,
 } from "./audit-types";
-import { TOOL_IDS } from "./audit-types";
 import { PRICING_DATA_AS_OF_ISO, PRICING_REFERENCE, VENDOR_PRICING_PAGE } from "./pricing-sources";
 import {
   expectedMonthlyTotal,
+  getConfiguredToolIds,
   getPlan,
   isEnterpriseTier,
   isTeamishTier,
@@ -716,7 +716,7 @@ function buildReportExecutiveSummary(
 }
 
 export function runAuditEngine(form: AuditFormValues): AuditReport {
-  const findings = TOOL_IDS.map((id) => analyzeTool(form, id)).filter(
+  const findings = getConfiguredToolIds().map((id) => analyzeTool(form, id)).filter(
     (finding): finding is ToolAuditFinding => Boolean(finding),
   );
 

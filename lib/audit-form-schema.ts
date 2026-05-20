@@ -46,13 +46,11 @@ export const auditFormSchema = z
       .min(1, "Team size must be at least 1")
       .max(500000, "Team size too large"),
     useCase: useCaseSchema,
-    tools: z.object({
-      chatgpt: toolShape,
-      claude: toolShape,
-      cursor: toolShape,
-      copilot: toolShape,
-      gemini: toolShape,
-    }),
+    tools: z.object(
+      Object.fromEntries(TOOL_IDS.map((id) => [id, toolShape])) as {
+        [K in (typeof TOOL_IDS)[number]]: typeof toolShape;
+      },
+    ),
   })
   .superRefine((data, ctx) => {
     const anyEnabled = TOOL_IDS.some((id) => data.tools[id].enabled);

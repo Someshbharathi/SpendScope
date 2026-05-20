@@ -1,4 +1,9 @@
-import type { AuditReport, ToolId } from "./audit-types";
+import type { AuditReport } from "./audit-types";
+import type { EnrichedPlanPriceChange, PlanPriceChange } from "./pricing-snapshot-diff";
+import {
+  getAffectedToolIdsFromChanges,
+  getAffectedToolLabelsFromChanges,
+} from "./pricing-snapshot-diff";
 
 const round2 = (n: number) => Math.round((n + Number.EPSILON) * 100) / 100;
 
@@ -48,25 +53,27 @@ export type ReauditDiffBlock = {
   annual_savings_delta: number | null;
   recommendation_changed: boolean;
   optimization_summaries_changed: boolean;
-  affected_tools: ToolId[];
+  /** Tool ids from detected price changes (catalog-driven). */
+  affected_tools: string[];
+  /** Human-readable tool names from `TOOL_PRICING`. */
+  affected_tool_labels: string[];
 };
-
-import type { PlanPriceChange } from "./pricing-snapshot-diff";
 
 export type DetectChangesWithReauditItem = {
   audit_id: string;
-  changes: PlanPriceChange[];
+  changes: EnrichedPlanPriceChange[];
   old_result: AuditResultSummary | null;
   new_result: AuditResultSummary;
   diff: ReauditDiffBlock;
 };
 
 export function buildReauditDiff(
-  pricingAffectedTools: ToolId[],
+  pricingChanges: PlanPriceChange[],
   oldReport: AuditReport | null,
   newReport: AuditReport,
 ): ReauditDiffBlock {
-  const affected_tools = [...new Set(pricingAffectedTools)].sort();
+  const affected_tools = getAffectedToolIdsFromChanges(pricingChanges);
+  const affected_tool_labels = getAffectedToolLabelsFromChanges(pricingChanges);
 
   const oldMonthly = oldReport ? round2(oldReport.totalMonthlySavings) : null;
   const oldAnnual = oldReport ? round2(oldReport.totalAnnualSavings) : null;
@@ -94,5 +101,6 @@ export function buildReauditDiff(
     recommendation_changed,
     optimization_summaries_changed,
     affected_tools,
+    affected_tool_labels,
   };
 }

@@ -1,6 +1,6 @@
 import type { AuditFormValues, EnabledToolPayload, ToolId, UseCase } from "./audit-types";
-import { TOOL_IDS, USE_CASES } from "./audit-types";
-import { getDefaultPlanId, getPlan } from "./pricing";
+import { USE_CASES } from "./audit-types";
+import { getConfiguredToolIds, getDefaultPlanId, getPlan, isConfiguredToolId } from "./pricing";
 
 function isUseCase(v: unknown): v is UseCase {
   return typeof v === "string" && (USE_CASES as readonly string[]).includes(v);
@@ -37,7 +37,7 @@ export function parseAuditRowToFormValues(row: {
   if (!Array.isArray(enabledToolsRaw) || enabledToolsRaw.length === 0) return null;
 
   const tools = {} as AuditFormValues["tools"];
-  for (const id of TOOL_IDS) {
+  for (const id of getConfiguredToolIds()) {
     tools[id] = {
       enabled: false,
       planId: getDefaultPlanId(id),
@@ -50,7 +50,7 @@ export function parseAuditRowToFormValues(row: {
     if (!raw || typeof raw !== "object") continue;
     const e = raw as Partial<EnabledToolPayload>;
     const toolId = e.toolId;
-    if (typeof toolId !== "string" || !(TOOL_IDS as readonly string[]).includes(toolId)) continue;
+    if (typeof toolId !== "string" || !isConfiguredToolId(toolId)) continue;
 
     const tid = toolId as ToolId;
     const rawPlan = typeof e.planId === "string" ? e.planId : getDefaultPlanId(tid);
@@ -70,7 +70,7 @@ export function parseAuditRowToFormValues(row: {
     };
   }
 
-  const anyEnabled = TOOL_IDS.some((id) => tools[id].enabled);
+  const anyEnabled = getConfiguredToolIds().some((id) => tools[id].enabled);
   if (!anyEnabled) return null;
 
   return {
