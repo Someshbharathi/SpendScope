@@ -81,22 +81,3 @@ export function diffSnapshotToolsAgainstCurrent(snapshotTools: unknown): PlanPri
 
   return changes;
 }
-
-export type AuditPricingChangeRow = {
-  audit_id: string;
-  affected_tools: ToolId[];
-  changes: PlanPriceChange[];
-};
-
-export function buildAuditPricingChangeRow(
-  auditId: string,
-  changes: PlanPriceChange[],
-): AuditPricingChangeRow {
-  const affected = [...new Set(changes.map((c) => c.tool))];
-  affected.sort();
-  return {
-    audit_id: auditId,
-    affected_tools: affected,
-    changes,
-  };
-}

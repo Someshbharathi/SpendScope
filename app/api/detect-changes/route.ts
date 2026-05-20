@@ -1,10 +1,15 @@
 import { NextResponse } from "next/server";
 
+import { parseAuditRowToFormValues } from "@/lib/audit-row-to-form-values";
 import {
-  buildAuditPricingChangeRow,
-  diffSnapshotToolsAgainstCurrent,
-  type AuditPricingChangeRow,
-} from "@/lib/pricing-snapshot-diff";
+  buildReauditDiff,
+  parseStoredAuditReport,
+  summarizeAuditReport,
+  type DetectChangesWithReauditItem,
+} from "@/lib/audit-rerun-diff";
+import { runAuditEngine } from "@/lib/audit-engine";
+import type { ToolId } from "@/lib/audit-types";
+import { diffSnapshotToolsAgainstCurrent } from "@/lib/pricing-snapshot-diff";
 import { getClientIp, rateLimit } from "@/lib/rate-limit";
 import { createServiceRoleClient } from "@/utils/supabase/admin";
 
@@ -12,12 +17,25 @@ export const runtime = "nodejs";
 
 const PAGE_SIZE = 500;
 
-type AuditRow = { id: string; pricing_snapshot: unknown };
+type AuditRow = {
+  id: string;
+  pricing_snapshot: unknown;
+  tools_json: unknown;
+  results_json: unknown;
+  email: unknown;
+  company_name: unknown;
+  role: unknown;
+  team_size: unknown;
+};
 
 function extractToolsFromSnapshot(raw: unknown): unknown {
   if (!raw || typeof raw !== "object") return null;
   const tools = (raw as { tools?: unknown }).tools;
   return tools ?? null;
+}
+
+function pricingAffectedTools(changes: { tool: ToolId }[]): ToolId[] {
+  return [...new Set(changes.map((c) => c.tool))].sort();
 }
 
 export async function GET(req: Request) {
@@ -42,13 +60,13 @@ export async function GET(req: Request) {
   }
 
   try {
-    const out: AuditPricingChangeRow[] = [];
+    const out: DetectChangesWithReauditItem[] = [];
     let offset = 0;
 
     for (;;) {
       const { data, error } = await admin
         .from("audits")
-        .select("id, pricing_snapshot")
+        .select("id, pricing_snapshot, tools_json, results_json, email, company_name, role, team_size")
         .order("id", { ascending: true })
         .range(offset, offset + PAGE_SIZE - 1);
 
@@ -61,10 +79,29 @@ export async function GET(req: Request) {
       if (rows.length === 0) break;
 
       for (const row of rows) {
-        const tools = extractToolsFromSnapshot(row.pricing_snapshot);
-        const changes = diffSnapshotToolsAgainstCurrent(tools);
+        const snapshotTools = extractToolsFromSnapshot(row.pricing_snapshot);
+        const changes = diffSnapshotToolsAgainstCurrent(snapshotTools);
         if (changes.length === 0) continue;
-        out.push(buildAuditPricingChangeRow(String(row.id), changes));
+
+        const form = parseAuditRowToFormValues(row);
+        if (!form) continue;
+
+        const oldReport = parseStoredAuditReport(row.results_json);
+        const newReport = runAuditEngine(form);
+
+        const affected = pricingAffectedTools(changes);
+        const diff = buildReauditDiff(affected, oldReport, newReport);
+
+        const newSummary = summarizeAuditReport(newReport);
+        if (!newSummary) continue;
+
+        out.push({
+          audit_id: String(row.id),
+          changes,
+          old_result: summarizeAuditReport(oldReport),
+          new_result: newSummary,
+          diff,
+        });
       }
 
       if (rows.length < PAGE_SIZE) break;
