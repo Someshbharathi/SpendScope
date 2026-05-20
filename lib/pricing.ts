@@ -1,4 +1,5 @@
-import type { ToolId, ToolPlan, ToolPricing } from "./audit-types";
+import type { AuditPricingSnapshot, ToolId, ToolPlan, ToolPricing } from "./audit-types";
+import { PRICING_DATA_AS_OF_ISO, PRICING_REFERENCE, VENDOR_PRICING_PAGE } from "./pricing-sources";
 
 export const TOOL_PRICING: Record<ToolId, ToolPricing> = {
   chatgpt: {
@@ -174,4 +175,14 @@ export function isTeamishTier(tier: ToolPlan["tier"]): boolean {
 
 export function isEnterpriseTier(tier: ToolPlan["tier"]): boolean {
   return tier === "enterprise";
+}
+
+/** Deep copy of current list-price benchmarks + metadata for Supabase `pricing_snapshot`. */
+export function buildAuditPricingSnapshot(): AuditPricingSnapshot {
+  return {
+    tools: structuredClone(TOOL_PRICING),
+    pricingDataAsOf: PRICING_DATA_AS_OF_ISO,
+    pricingDataReference: PRICING_REFERENCE,
+    vendorPricingPages: structuredClone(VENDOR_PRICING_PAGE),
+  };
 }

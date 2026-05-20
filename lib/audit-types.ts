@@ -34,6 +34,17 @@ export interface ToolPricing {
   plans: ToolPlan[];
 }
 
+/**
+ * Benchmark snapshot stored on each audit row (`pricing_snapshot` jsonb).
+ * Built from the same sources as the audit engine: `TOOL_PRICING` plus PRICING_DATA / vendor metadata.
+ */
+export interface AuditPricingSnapshot {
+  tools: Record<ToolId, ToolPricing>;
+  pricingDataAsOf: string;
+  pricingDataReference: string;
+  vendorPricingPages: Record<ToolId, string>;
+}
+
 export interface ToolFormValues {
   enabled: boolean;
   planId: string;
@@ -155,4 +166,5 @@ export interface AuditInsertPayload {
   };
   results_json: AuditReport;
   share_id: string;
+  pricing_snapshot: AuditPricingSnapshot;
 }

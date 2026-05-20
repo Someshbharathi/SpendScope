@@ -7,7 +7,7 @@ import type {
   EnabledToolPayload,
 } from "./audit-types";
 import { TOOL_IDS } from "./audit-types";
-import { getPlan, TOOL_PRICING } from "./pricing";
+import { buildAuditPricingSnapshot, getPlan, TOOL_PRICING } from "./pricing";
 
 export function getEnabledToolsPayload(values: AuditFormValues): EnabledToolPayload[] {
   const enabledTools: EnabledToolPayload[] = [];
@@ -47,6 +47,7 @@ export function buildAuditInsertPayload(
     },
     results_json: report,
     share_id: shareId,
+    pricing_snapshot: buildAuditPricingSnapshot(),
   };
 }
 
