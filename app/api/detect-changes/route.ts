@@ -16,7 +16,7 @@ import {
   enrichPlanPriceChanges,
 } from "@/lib/pricing-snapshot-diff";
 import { getClientIp, rateLimit } from "@/lib/rate-limit";
-import { createServiceRoleClient } from "@/utils/supabase/admin";
+import { createServiceRoleClient, getServiceRoleEnvStatus } from "@/utils/supabase/admin";
 
 export const runtime = "nodejs";
 
@@ -60,12 +60,23 @@ export async function GET(req: Request) {
     );
   }
 
+  const envStatus = getServiceRoleEnvStatus();
   const admin = createServiceRoleClient();
   if (!admin) {
     return NextResponse.json(
       {
         error:
           "Server misconfiguration: SUPABASE_SERVICE_ROLE_KEY and NEXT_PUBLIC_SUPABASE_URL are required for this route (reads all audits; bypasses RLS).",
+        diagnostics: {
+          ...envStatus,
+          vercelEnv: process.env.VERCEL_ENV ?? null,
+        },
+        hint:
+          !envStatus.hasServiceRoleKey && envStatus.hasSupabaseUrl
+            ? "SUPABASE_SERVICE_ROLE_KEY is missing or empty on this deployment. Add it in Vercel → Settings → Environment Variables for Preview (and Production if needed), then redeploy."
+            : !envStatus.hasSupabaseUrl && envStatus.hasServiceRoleKey
+              ? "NEXT_PUBLIC_SUPABASE_URL is missing or empty on this deployment. Add it in Vercel for the same environment as this URL, then redeploy."
+              : "Add both variables to the Vercel environment that serves this URL (Preview vs Production), then trigger a new deployment.",
       },
       { status: 503 },
     );

@@ -122,6 +122,8 @@ Create a `.env.local` file:
 ```env
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+# Server-only (required for GET /api/detect-changes). Never use a NEXT_PUBLIC_ prefix.
+SUPABASE_SERVICE_ROLE_KEY=
 
 RESEND_API_KEY=
 RESEND_FROM_EMAIL=onboarding@resend.dev

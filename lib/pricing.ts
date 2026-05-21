@@ -15,7 +15,7 @@ export const TOOL_PRICING: Record<ToolId, ToolPricing> = {
       {
         id: "plus",
         label: "Plus",
-        monthlyPerSeat: 20,
+        monthlyPerSeat: 10,
         tier: "individual",
       },
       {
