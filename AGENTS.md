@@ -152,10 +152,13 @@ Important environment variables:
 ```txt id="r7m2x5"
 NEXT_PUBLIC_SUPABASE_URL
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+SUPABASE_SERVICE_ROLE_KEY
 GEMINI_API_KEY
 RESEND_API_KEY
 NEXT_PUBLIC_APP_URL
 ```
+
+`SUPABASE_SERVICE_ROLE_KEY` is **server-only** (never `NEXT_PUBLIC_*`). Required for trusted routes such as `/api/detect-changes` that read all `audits` rows (bypasses RLS).
 
 ---
 

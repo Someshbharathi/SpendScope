@@ -122,9 +122,12 @@ Create a `.env.local` file:
 ```env
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+# Server-only (required for GET /api/detect-changes). Never use a NEXT_PUBLIC_ prefix.
+SUPABASE_SERVICE_ROLE_KEY=
 
 RESEND_API_KEY=
-RESEND_FROM_EMAIL=onboarding@resend.dev
+# Optional override; default is SpendScope <noreply@spendscope.site> (verified domain)
+RESEND_FROM_EMAIL=SpendScope <noreply@spendscope.site>
 
 # AI executive summary (optional — if unset, the API falls back to a deterministic paragraph)
 GEMINI_API_KEY=
