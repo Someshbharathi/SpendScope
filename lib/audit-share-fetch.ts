@@ -47,12 +47,13 @@ export async function fetchAuditByShareId(
   if (!rowRaw || typeof rowRaw !== "object") return null;
 
   const row = rowRaw as Record<string, unknown>;
-  if (typeof row.share_id !== "string" || typeof row.company_name !== "string") return null;
+  const resolvedShareId = row.share_id != null ? String(row.share_id).trim() : "";
+  if (!resolvedShareId) return null;
 
   return {
     id: String(row.id ?? ""),
-    share_id: row.share_id,
-    company_name: row.company_name,
+    share_id: resolvedShareId,
+    company_name: typeof row.company_name === "string" ? row.company_name : "",
     role: typeof row.role === "string" ? row.role : "",
     team_size: typeof row.team_size === "number" && Number.isFinite(row.team_size) ? row.team_size : 0,
     email: typeof row.email === "string" ? row.email.trim() : "",

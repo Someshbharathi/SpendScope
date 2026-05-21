@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { sendPricingChangeNotifications } from "@/lib/detect-changes-notify";
 import { getPublicOriginFromRequest } from "@/lib/email/site-url";
 import { isValidShareIdFormat } from "@/lib/audit-share-fetch";
-import { parseAuditRowToFormValues } from "@/lib/audit-row-to-form-values";
+import { parseAuditRowToFormValuesForReaudit } from "@/lib/audit-row-to-form-values";
 import {
   buildReauditDiff,
   parseStoredAuditReport,
@@ -106,7 +106,7 @@ export async function GET(req: Request) {
         const rawChanges = diffSnapshotToolsAgainstCurrent(snapshotTools);
         if (rawChanges.length === 0) continue;
 
-        const form = parseAuditRowToFormValues(row);
+        const form = parseAuditRowToFormValuesForReaudit(row);
         if (!form) continue;
 
         const oldReport = parseStoredAuditReport(row.results_json);
@@ -118,7 +118,7 @@ export async function GET(req: Request) {
         if (!newSummary) continue;
 
         const email = typeof row.email === "string" ? row.email.trim() : "";
-        const shareId = typeof row.share_id === "string" ? row.share_id.trim() : "";
+        const shareId = row.share_id != null ? String(row.share_id).trim() : "";
         if (!shareId || !isValidShareIdFormat(shareId)) continue;
 
         out.push({

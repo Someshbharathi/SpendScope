@@ -4,6 +4,7 @@ import {
   buildConsolidatedPricingChangeEmailHtml,
   PRICING_CHANGE_EMAIL_SUBJECT,
 } from "@/lib/email/pricing-change-notification-email";
+import { getResendFrom } from "@/lib/email/resend-from";
 import { isResendConfigured } from "@/lib/email/send-audit-report-email";
 import {
   buildConsolidatedPricingChangeEmailText,
@@ -14,12 +15,6 @@ export type SendConsolidatedPricingChangeEmailParams = {
   to: string;
   audits: PricingChangeNotificationAudit[];
 };
-
-function getResendFrom(): string {
-  return (
-    process.env.RESEND_FROM_EMAIL?.trim() || "SpendScope <onboarding@resend.dev>"
-  );
-}
 
 /**
  * One consolidated notification per user (all affected audits in a single message).

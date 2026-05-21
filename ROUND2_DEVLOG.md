@@ -121,75 +121,45 @@ Updated tests to align with the centralized pricing config instead of hardcoded 
 
 ## 2026-05-20 20:00 — Preview deployment issues
 
-Preview deployment initially broke because `NEXT_PUBLIC_APP_URL` was still pointing to localhost.
-
-Emails were generating broken re-audit links even though localhost testing worked fine.
-
-Updated preview environment variables and redeployed.
+Preview deployment was working partially, but I noticed some routes behaved differently compared to localhost. The biggest issue was around re-audit links and environment variables. `NEXT_PUBLIC_APP_URL` was still pointing to localhost in Preview, which caused generated links inside emails to break even though the flow worked locally. Spent some time checking Vercel environment configs and redeploying until the preview build matched local behavior properly.
 
 ---
 
-## 2026-05-20 21:10 — End-to-end testing
+## 2026-05-20 21:10 — Started making a domain for the site
 
-Ran the full reviewer flow several times:
+Decided to set up a proper domain for email delivery after realizing Resend testing mode only allows sending emails to my own address. Since reviewers might test using different emails, I wanted the notification flow to work realistically. Started configuring Cloudflare DNS records for Resend domain verification. This was my first time doing a full email domain setup manually, so I had to carefully check DKIM, SPF, and MX records multiple times.
+
+---
+
+## 2026-05-20 22:40 — Rectified deployment and configuration issues
+
+Most of the deployment issues ended up being environment-related rather than code-related. Fixed incorrect app URLs, redeployed Preview builds, and verified that API routes were using the correct server-side environment variables. Also cleaned up a few edge cases where failed reruns or missing snapshots could cause confusing API responses.Lost one hour
+
+---
+
+## 2026-05-21 06:15 — Reviewed remaining tasks and found a major deployment blocker
+
+Started reviewing the final submission checklist and realized the `/api/detect-changes` endpoint was still failing on the deployed Preview environment even though it worked locally. After debugging for a while, I found that the `SUPABASE_SERVICE_ROLE_KEY` was missing in Vercel Preview environment variables. At the same time, the email domain verification was still propagating, so the notification system could not yet send emails to external recipients. This ended up becoming the biggest blocker during the final stretch.
+
+---
+
+## 2026-05-21 08:00 — Fixed the `/api/detect-changes` deployment issue
+
+Added the missing service role key to Vercel Preview variables and triggered a fresh redeploy. After that, the detection route finally started working correctly on the deployed environment instead of throwing configuration errors. Retested the entire flow again:
 
 * create audit
-* save pricing snapshot
-* modify benchmark pricing
+* modify pricing
 * trigger detect-changes
-* receive consolidated email
-* open re-audit link
-* verify comparison page
+* generate rerun
+* send notification email
 
-This was the first point where the entire flow worked properly end-to-end.
-
----
-
-## 2026-05-20 22:40 — Considered automated pricing scraping
-
-Thought about building automatic vendor pricing scraping, but decided against it.
-
-Given the 36-hour limit, centralized benchmark configs felt safer and more deterministic than brittle parsers against pricing pages.
-
-Kept pricing updates manual through `TOOL_PRICING`.
+This was probably the most relieving point of the whole Round 2 process because the full pipeline was finally stable outside localhost.
 
 ---
 
-## 2026-05-21 00:15 — Final cleanup phase
+## 2026-05-21 09:20 — Final docs and domain verification waiting
 
-Focused mostly on:
-
-* edge cases
-* invalid IDs
-* missing snapshots
-* email failure handling
-* loading states
-* CI stability
-
-Avoided adding extra features at this point because the core workflow was already complete.
+At this point most of the engineering work was done, so I focused on preparing the required submission documents and doing final cleanup. The only thing still pending was DNS propagation for the Resend domain verification, which can take some time depending on the provider. Apart from that, CI was green, Preview deployment was stable, and the re-audit workflow was functioning end-to-end. Still the domain is not created so i am probably not able to submit on time.
+I need a domain because the resend requires a domain verification for sending emails to everyone instead on one person. Resend is in test mode right now which send mails to only one mail.
 
 ---
-
-## 2026-05-21 02:00 — PR docs and review prep
-
-Started writing:
-
-* ROUND2_PR.md
-* ROUND2_DEVLOG.md
-* ROUND2_REFLECTION.md
-
-Tried to keep the explanations honest and focused on engineering decisions instead of making the project sound bigger than it is.
-
----
-
-## 2026-05-21 09:20 — Final verification before submission
-
-Did one final full-flow test on the preview deployment:
-
-* audit creation
-* pricing change detection
-* consolidated email
-* re-audit comparison page
-* CI checks
-
-Everything working consistently now. Main focus at this point is keeping the submission stable instead of continuing to add features.

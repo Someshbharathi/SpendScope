@@ -41,9 +41,10 @@ function renderAuditSection(audit: PricingChangeNotificationAudit, index: number
   const title = escapeHtml(
     audit.audit_id ? `${baseTitle}` : baseTitle,
   );
+  const shareRef = audit.reaudit_url.split("/re-audit/")[1]?.split(/[?#]/)[0]?.trim();
   const subtitle =
-    audit.audit_id.length >= 8
-      ? `<p style="margin:0 0 12px;font-size:12px;line-height:1.4;color:#64748b;">Audit ref ${escapeHtml(audit.audit_id.slice(0, 8))}…</p>`
+    shareRef && shareRef.length >= 8
+      ? `<p style="margin:0 0 12px;font-size:12px;line-height:1.4;color:#64748b;">Share link ${escapeHtml(decodeURIComponent(shareRef).slice(0, 8))}…</p>`
       : "";
   const divider =
     index > 0

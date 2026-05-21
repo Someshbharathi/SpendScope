@@ -1,5 +1,6 @@
 import { Resend } from "resend";
 
+import { getResendFrom } from "@/lib/email/resend-from";
 import {
   buildAuditReportEmailHtml,
   buildAuditReportPlainText,
@@ -9,12 +10,6 @@ import {
 export type SendAuditReportEmailParams = AuditReportEmailContent & {
   to: string;
 };
-
-function getResendFrom(): string {
-  return (
-    process.env.RESEND_FROM_EMAIL?.trim() || "SpendScope <onboarding@resend.dev>"
-  );
-}
 
 export function isResendConfigured(): boolean {
   return Boolean(process.env.RESEND_API_KEY?.trim());
