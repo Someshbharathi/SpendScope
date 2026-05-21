@@ -1,5 +1,5 @@
 import { isValidShareIdFormat } from "@/lib/audit-share-fetch";
-import { getPublicAppOrigin, getPublicOriginFromRequest } from "@/lib/email/site-url";
+import { getPublicOriginFromRequest } from "@/lib/email/site-url";
 import { isResendConfigured, sendConsolidatedPricingChangeEmail } from "@/lib/email/send-pricing-change-notification-email";
 import type { DetectChangesWithReauditItem } from "@/lib/audit-rerun-diff";
 import type { PricingChangeNotificationAudit } from "@/lib/pricing-change-summary";
@@ -72,9 +72,7 @@ export async function sendPricingChangeNotifications(
   >,
   req: Request,
 ): Promise<DetectChangesNotificationResult> {
-  const origin = process.env.NEXT_PUBLIC_APP_URL?.trim()
-    ? getPublicAppOrigin()
-    : getPublicOriginFromRequest(req);
+  const origin = getPublicOriginFromRequest(req);
 
   const result: DetectChangesNotificationResult = {
     emails_sent: 0,

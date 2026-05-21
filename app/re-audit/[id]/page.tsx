@@ -8,6 +8,9 @@ import { buildReauditComparisonPayload } from "@/lib/reaudit-comparison";
 import { formatCurrency } from "@/lib/format-currency";
 import { createClient } from "@/utils/supabase/server";
 
+/** Always run on the server so Vercel serves this dynamic route on demand. */
+export const dynamic = "force-dynamic";
+
 type PageProps = {
   /** Share UUID from notification emails (`/re-audit/{id}`). */
   params: Promise<{ id: string }>;
@@ -36,7 +39,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function ReauditComparisonPage({ params }: PageProps) {
-  const { id } = await params;
+  const { id: rawId } = await params;
+  const id = decodeURIComponent(rawId).trim();
   if (!isValidShareIdFormat(id)) notFound();
 
   const cookieStore = await cookies();

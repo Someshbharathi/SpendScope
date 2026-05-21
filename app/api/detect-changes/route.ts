@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { sendPricingChangeNotifications } from "@/lib/detect-changes-notify";
-import { getPublicAppOrigin, getPublicOriginFromRequest } from "@/lib/email/site-url";
+import { getPublicOriginFromRequest } from "@/lib/email/site-url";
 import { isValidShareIdFormat } from "@/lib/audit-share-fetch";
 import { parseAuditRowToFormValues } from "@/lib/audit-row-to-form-values";
 import {
@@ -130,9 +130,7 @@ export async function GET(req: Request) {
 
     const notifications = await sendPricingChangeNotifications(out, req);
 
-    const origin = process.env.NEXT_PUBLIC_APP_URL?.trim()
-      ? getPublicAppOrigin()
-      : getPublicOriginFromRequest(req);
+    const origin = getPublicOriginFromRequest(req);
 
     const audits = out.map((row) => ({
       audit_id: row.audit_id,
