@@ -134,12 +134,15 @@ export async function GET(req: Request) {
       ? getPublicAppOrigin()
       : getPublicOriginFromRequest(req);
 
-    const audits = out.map(({ email: _email, company_name, audit_id, share_id, ...rest }) => ({
-      ...rest,
-      audit_id,
-      company_name,
-      share_id,
-      reaudit_url: `${origin.replace(/\/$/, "")}/re-audit/${encodeURIComponent(share_id)}`,
+    const audits = out.map((row) => ({
+      audit_id: row.audit_id,
+      changes: row.changes,
+      old_result: row.old_result,
+      new_result: row.new_result,
+      diff: row.diff,
+      company_name: row.company_name,
+      share_id: row.share_id,
+      reaudit_url: `${origin.replace(/\/$/, "")}/re-audit/${encodeURIComponent(row.share_id)}`,
     }));
 
     return NextResponse.json({ audits, notifications });

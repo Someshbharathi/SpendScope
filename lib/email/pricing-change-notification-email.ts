@@ -1,7 +1,6 @@
 import { escapeHtml } from "@/lib/email/escape-html";
 import { formatCurrency } from "@/lib/format-currency";
 import {
-  buildConsolidatedPricingChangeEmailText,
   formatPlanPriceChangeBullet,
   type PricingChangeNotificationAudit,
 } from "@/lib/pricing-change-summary";
