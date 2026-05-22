@@ -126,8 +126,9 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 
 RESEND_API_KEY=
-# Optional override; default is SpendScope <noreply@spendscope.site> (verified domain)
-RESEND_FROM_EMAIL=SpendScope <noreply@spendscope.site>
+# Resend test mode: sends from onboarding@resend.dev (see lib/email/resend-from.ts).
+# After domain verification, set RESEND_FROM_EMAIL=SpendScope <noreply@spendscope.site> on Vercel
+# and flip USE_RESEND_TEST_SENDER to false in resend-from.ts.
 
 # AI executive summary (optional — if unset, the API falls back to a deterministic paragraph)
 GEMINI_API_KEY=
